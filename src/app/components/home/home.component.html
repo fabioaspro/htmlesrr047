@@ -1,0 +1,260 @@
+<div class="sample-container">
+  <po-loading-overlay *ngIf="loadTela===true" [p-text]="labelLoadTela" [p-screen-lock]="true"></po-loading-overlay>
+</div>
+
+<app-dn-modal
+                [visible]="mostrarModal"
+                title="Confirmar Documento ?"
+                [message]="mensagemModal"
+                (confirm)="onConfirmarExclusao($event)">
+  </app-dn-modal>
+
+<div class="cabec">
+    <div class="campofiltrosc">
+        
+        <po-combo class="combo-estab" [ngModel]="codEstabelecimento" 
+                    (ngModelChange)="codEstabelecimento = $event"
+            
+                    (p-change)="onEstabChange($event)" 
+                    p-clean="true" 
+                    [p-options]="listaEstabelecimentos"
+            
+                    p-label="Estabelecimento" 
+                    p-icon="bi bi-pin-map" 
+                    [p-placeholder]="placeHolderEstabelecimento">
+            <ng-template p-combo-option-template let-option>
+            <div class="po-row">
+                <po-icon class="po-sm-2 po-md-3 po-lg-1" p-size="sm" p-icon="bi bi-pin-map"></po-icon>
+                <div class="po-sm-10 po-md-9 po-lg-11">
+                <div class="po-font-text-large-bold">{{ option.label }}</div>
+                <div class="po-font-text-smaller">Filial: {{ option.codFilial }}</div>
+                </div>
+            </div>
+            </ng-template>
+        </po-combo>
+        <po-lookup 
+                          class="po-md-12"
+                          name="codEmitente"
+                          [(ngModel)]="codEmitente"
+                          [p-filter-params]="codigoEmitente ? { codigoEmit: codigoEmitente } : {}"
+                          p-label="Emitente"
+                          [p-virtual-scroll]="true"
+                          p-placeholder="Selecione um Emitente"
+                          changeVisibleColumns="['codEmitente', 'nomeAbrev']"
+                          [p-field-format]="['codEmitente', 'nomeAbrev']"
+                          
+                          [p-columns]="columns"
+                          [p-filter-service]="EmitenteService"                    
+                          [p-literals]="{ 'modalTitle': 'Zoom de Emitente' }"
+                          p-field-value="codEmitente"
+                          p-clean="true"
+                          (p-change)="onEmitenteChange($event)"                
+                        >
+                </po-lookup>
+        <po-input class="po-md-6" name="nrNotaFis" [(ngModel)]="nrNotaFis" p-placeholder="NF"              p-label="NF"              p-required [p-maxlength]="7"></po-input>
+        <po-input class="po-md-6" name="serie"     [(ngModel)]="serie"     p-placeholder="Serie"           p-label="Serie"           p-required [p-maxlength]="3"></po-input>
+        <po-input class="po-md-6" name="qtd"       [(ngModel)]="qtd"       p-placeholder="Qtd"             p-label="Qtd"             p-required [p-maxlength]="7" p-disabled="true"></po-input>
+
+    
+        <po-button p-tooltip="Buscar Dados"    p-icon="bi bi-check2-circle"  p-label="Buscar Dados"    p-kind="primary" (p-click)="Selecionar()" ></po-button>
+        <po-button p-tooltip="Limpar Filtros"  p-icon="bi bi-eraser-fill"    p-label="Limpar filtros"  p-kind="primary" (p-click)="limparFiltros()"> </po-button>
+    </div>
+    
+
+  <div class="selecao">
+
+      <po-button p-tooltip="Confirmar Documento" p-icon="bi bi-clipboard-check" p-label="Confirmar Documento" p-kind="primary" (p-click)="onConfirmar()"></po-button>
+      <!--
+      <po-button p-tooltip="Relatório"           p-icon="bi bi-printer"         p-label="Relatório"           p-kind="primary" (p-click)="onRelatorio()"></po-button>
+      -->
+  </div>
+
+</div>
+<div class="grid">
+  
+  <p style="font-size: 15px; font-weight: bold; margin-bottom: -20px;">Reparos Selecionados: {{this.total}}</p>
+
+  <p style="font-size: 15px; display: flex; justify-content: flex-end; margin-right: 260px; margin-bottom: -40px;">        
+    <po-button  p-tooltip="Listagem em Excel"  p-icon="an an-microsoft-excel-logo"  p-label=""  (p-click)="onExcel()"          p-kind="primary"> </po-button>
+    <po-button  p-tooltip="Pesquisa Avançada"  p-icon="bi bi-funnel"                p-label=""  (p-click)="onFiltroAvancado()" p-kind="primary"> </po-button>
+  </p>  
+  <po-table #grid2  [p-items]="listaReparos"
+                    [p-columns]="colunasReparos" 
+                    [p-selectable]="true"
+                    [p-single-select]="false"
+                    (p-selected)="changeOptions($event)"
+                    (p-unselected)="changeOptions($event)"
+                    (p-all-selected)="changeOptions($event)"
+                    (p-all-unselected)="changeOptions($event)"
+                    [p-striped]="true" 
+                    [p-hide-table-search]="false" 
+                    [p-hide-columns-manager]="true" 
+                    p-container="true" 
+                    [p-height]="alturaGrid"
+                    [p-loading]="loadTela"
+                    [p-sort]="true" >
+                   <ng-template p-table-cell-template let-column="column" let-row="row">
+           
+                    @if(column.property === 'opcoes'){
+                        <div class="menuGrid">
+                            <div><button class="btn"  (click)="Detalhe(row)"><p><i class="bi bi-archive"></i> Notas Fiscais</p></button></div>
+                        </div>
+                    }
+                  </ng-template>
+          
+  </po-table>
+  
+</div>
+
+<po-modal #telaSelecao p-title="Parâmetros de Seleção"
+                              p-size="auto" 
+                              p-click-out="false" 
+                              [p-hide-close]="true"
+                              [p-primary-action]="acaoSelecionar" 
+                              [p-secondary-action]="acaoCancelarSelecao">
+
+
+      <form #formSelecao="ngForm">
+        <div class="po-row">
+            <po-datepicker
+            class="po-md-6"
+            name="dtIni"
+            [(ngModel)]="dtIni"
+            p-clean
+            p-format="dd/mm/yyyy"
+            p-label="Data Inicial"
+            p-required
+            [p-max-date]="dtIni"
+            >
+            </po-datepicker>
+
+            <po-datepicker
+            class="po-md-6"
+            name="dtFim"
+            [(ngModel)]="dtFim"
+            p-clean
+            p-format="dd/mm/yyyy"
+            p-label="Data Final"
+            p-required
+            [p-min-date]="dtFim"
+            >
+            </po-datepicker>
+        </div>
+        <div class="po-row">
+          <po-input
+          class="po-md-6"
+          name="estabIni"
+          [(ngModel)]="estabIni"
+          p-placeholder="Estab Inicial"
+          p-label="Estab Inicial"
+          p-required
+          [p-maxlength]="3"
+          >
+          </po-input>
+
+          <po-input
+          class="po-md-6"
+          name="estabFim"
+          [(ngModel)]="estabFim"
+          p-label="Estab Final"
+          p-placeholder="Estab Final"
+          p-required
+          [p-maxlength]="3"
+          >
+          </po-input>
+      </div>
+
+        <div class="po-row">
+            <po-input
+            class="po-md-6"
+            name="tecIni"
+            [(ngModel)]="tecIni"
+            p-placeholder="Técnico Inicial"
+            p-label="Técnico Origem Inicial"
+            p-required
+            [p-maxlength]="6"
+            >
+            </po-input>
+
+            <po-input
+            class="po-md-6"
+            name="tecFim"
+            [(ngModel)]="tecFim"
+            p-label="Técnico Origem Final"
+            p-placeholder="Técnico Final"
+            p-required
+            [p-maxlength]="6"
+            >
+            </po-input>
+        </div>
+
+        <div class="po-row">
+            <po-input
+            class="po-md-6"
+            name="tecDestIni"
+            [(ngModel)]="tecDestIni"
+            p-label="Técnico Destino Inicial"
+            p-required
+            [p-maxlength]="6"
+            >
+            </po-input>
+
+            <po-input
+            class="po-md-6"
+            name="tecDestFim"
+            [(ngModel)]="tecDestFim"
+            p-placeholder="Técnico Final"
+            p-label="Técnico Destino Final"
+            p-required
+            [p-maxlength]="6"
+            >
+            </po-input>
+        </div>
+
+        <div class="po-row">
+          <po-input
+          class="po-md-6"
+          name="itCodigoIni"
+          [(ngModel)]="itCodigoIni"
+          p-label="Item Inicial"
+          p-required
+          [p-maxlength]="16"
+          >
+          </po-input>
+
+          <po-input
+          class="po-md-6"
+          name="itCodigoFim"
+          [(ngModel)]="itCodigoFim"
+          p-label="Item Final"
+          p-required
+          [p-maxlength]="16"
+          >
+          </po-input>
+      </div>
+        </form>
+  </po-modal>
+
+  <po-modal #telaFiltroAvancado p-title="Filtro Avançado"
+                                p-size="md" 
+                                p-click-out="false" 
+                                [p-hide-close]="true"
+                                [p-primary-action]="acaoConfirmarFiltro" 
+                                [p-secondary-action]="acaoCancelarFiltro">
+      
+      <form [formGroup]="formNota">
+        
+          <div class="filtroAvancado">
+         
+            <dn-range [cLabel]="filtro.cLabelCodEstabel"  [(cini)]="filtro.valEstabIni"   [(cfim)]="filtro.valEstabFim"   type="text"   cmask="AAA"></dn-range>
+            <dn-range [cLabel]="filtro.cLabelCodEmit"     [(cini)]="filtro.valEmitIni"    [(cfim)]="filtro.valEmitFim"    type="number" cmask="000000000"></dn-range>
+            <dn-range [cLabel]="filtro.cLabelItem"        [(cini)]="filtro.valItemIni"    [(cfim)]="filtro.valItemFim"    type="text"   cmask="AA.AAA.AAAAA-AA"></dn-range>
+            
+          </div>        
+
+      </form>
+    
+      <div class="limpar">
+        <po-button p-tooltip="Limpar Filtros"  p-icon="bi bi-eraser-fill" p-label="Limpar filtros" (p-click)="limparFiltros()" [p-disabled]="!filtrosAlterados"> </po-button>
+      </div>
+  </po-modal>

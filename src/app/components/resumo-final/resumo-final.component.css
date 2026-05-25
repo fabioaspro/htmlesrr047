@@ -1,0 +1,227 @@
+.campofiltros{
+
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    justify-items: start;
+    align-items: flex-end;
+    
+}
+
+po-button {
+  white-space: nowrap;
+}
+
+.cabec{
+    display: flex; 
+    gap:10px;
+    align-items: center; 
+
+    justify-content: start; 
+    margin-top: 10px;
+    z-index: 99;
+    
+}
+
+/* Estabelecimento */
+.cabec po-combo:nth-child(1) {
+  flex: 0 0 400px; /* largura fixa menor */
+}
+
+.selecao {
+    display: flex;               /* 👈 ativa o flexbox */
+    align-items: center;         /* 👈 centraliza vertical */
+    gap: 4px;
+
+    flex-grow: 1;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
+    border: 1px solid gray; 
+    border-radius: 4px; 
+    padding: 0 20px;             /* ajusta padding */
+    height: 102px;
+    background-color: whitesmoke;
+    
+}
+
+.combo-full {
+  width: 100%;
+}
+
+.filtros-container {
+    display: flex;               /* 👈 ativa o flexbox */
+    align-items: center;         /* 👈 centraliza vertical */
+    gap: 4px;
+    flex-grow: 1;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
+    border: 1px solid gray; 
+    border-radius: 4px; 
+    padding: 0 20px;             /* ajusta padding */
+    height: 102px;
+    background-color: whitesmoke;
+}
+
+.combo-com-botao po-combo{
+  flex: 0; /* O combo cresce para ocupar espaço */
+  min-width: 500px;  
+}
+
+/*antigo
+.filtros-container po-combo:nth-child(1),
+.filtros-container po-combo:nth-child(2){
+  flex: 0; 
+  min-width: 500px;  
+}
+.filtros-container po-combo:nth-child(3){
+  flex: 1; 
+  min-width: 100px;
+  width: 100px;  
+}
+*/
+
+
+/* Estabelecimento */
+.filtros-container po-combo:nth-child(1) {
+  flex: 0 0 400px; /* largura fixa menor */
+}
+
+/* Destino (MENOR) */
+.filtros-container po-combo:nth-child(2) {
+  flex: 0 0 350px; /* 👈 diminui destino */
+}
+
+/* Item (MAIOR) */
+.filtros-container po-combo:nth-child(3) {
+  flex: 1 1 auto; /* 👈 ocupa o espaço restante */
+  min-width: 350px;
+}
+
+
+
+.tipoBusca{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
+    border: 1px solid gray; 
+    border-radius: 4px;
+    padding: 10px 0 10px 20px; 
+    height: 100px;
+    width: 30%;
+    background-color: whitesmoke;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+}
+
+
+po-widget {
+  width: 100%;
+}
+
+po-table {
+  margin-top: 10px;
+}
+
+
+.titulo-box {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c2c2c;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dcdcdc;
+  
+  margin-bottom: 20px; /* 👈 cria o espaço (2 linhas aprox) */
+
+}
+
+.campofiltrosc {
+    display: flex;
+    flex-direction: column;   /* 👈 ESSENCIAL */
+    gap: 12px;                /* espaço entre blocos */
+    align-items: stretch;     /* ocupa largura total */
+    
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
+    border: 1px solid gray; 
+    border-radius: 4px; 
+    padding: 16px;            /* melhora respiro */
+    background-color: whitesmoke;
+    width: 100%;
+    height: auto;             /* 👈 remove altura fixa */
+}
+
+.campofiltros {
+    display: flex;
+    
+    gap: 12px;                /* espaço entre blocos */
+    align-items: stretch;     /* ocupa largura total */
+    
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
+    border: 1px solid gray; 
+    border-radius: 4px; 
+    padding: 16px;            /* melhora respiro */
+    background-color: whitesmoke;
+    width: 100%;
+    height: auto;             /* 👈 remove altura fixa */
+}
+
+.botoes-acoes {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.grid{
+    border: 1px solid lightgray; 
+    border-radius: 4px; 
+    padding: 10px; 
+    margin-top: 10px;
+}
+
+
+.item-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.item-codigo {
+  width: 180px;
+}
+
+.item-search {
+  margin-bottom: 6px; 
+}
+
+.item-descricao {
+  flex: 1;
+  min-width: 350px;
+}
+
+.switch-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between; /* 👈 joga um pra cada lado */
+  gap: 16px;
+}
+.confirm-msg p {
+  margin-bottom: 12px;
+}
+
+.confirm-box {
+  background: #f7f7f7;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.confirm-box .linha {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.confirm-box .linha span {
+  color: #555;
+}
+
+.confirm-box .linha.destaque strong {
+  color: #c62828;
+  font-weight: 600;
+}

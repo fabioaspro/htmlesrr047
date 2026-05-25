@@ -1,0 +1,117 @@
+::ng-deep .po-menu-item-active,
+::ng-deep .po-menu-item-selected,
+::ng-deep .po-menu-item:hover,
+::ng-deep .po-dropdown-item:hover,
+::ng-deep .po-dropdown-item-selected
+{
+  background-color: #BBDEFB !important;
+  color:  #045B8F !important;
+  fill:  #045B8F !important; 
+}
+
+::ng-deep .po-button,
+::ng-deep .po-button-selected
+{
+  background-color:#004b87 !important;
+  color: white !important;
+  fill:  #045B8F !important;   
+}
+
+::ng-deep .po-toolbar-title,
+::ng-deep .po-menu-mobile,
+::ng-deep .po-menu-icon-label
+{
+  color:  #045B8F !important;
+}
+
+::ng-deep .po-menu .po-menu-icon-item,
+::ng-deep .po-menu-item,
+::ng-deep .po-menu-collapse-button-icon,
+::ng-deep .po-field-icon
+
+{
+  color:  #045B8F !important;
+  fill:  #045B8F !important; 
+}
+
+::ng-deep .po-input:focus{
+    border-color: #045B8F !important;
+}
+
+::ng-deep .po-po-button-primary:hover
+::ng-deep .po-po-button-primary:focus
+{
+    border-color: #045B8F !important;
+    box-shadow: 0 0 0 2px #045B8F !important;
+}
+
+:root {
+  --color-01: #004b87 !important;
+  --color-02: #0088b9 !important;
+  --color-03: #470a68 !important;
+  --color-04: #702876 !important;
+  --color-05: #a51f66 !important;
+  --color-06: #f185ce !important;
+  --color-07: #a6192e !important;
+  --color-08: #f99e1d !important;
+  --color-09: #0088b9 !important;
+  --color-10: #007a87 !important;
+  
+  --color-feedback-info-lightest: #f6e6e5 !important;
+  --color-feedback-info-lighter: #e3aeab !important;
+  --color-feedback-info-light: #d58581 !important;
+  --color-feedback-info-base: #be3e37 !important;
+  --color-feedback-info-dark: #9b2d27 !important;
+  --color-feedback-info-darker: #72211d !important;
+  --color-feedback-info-darkest: #4a1512 !important;
+
+  --po-color-primary: #045B8F !important;
+  --po-color-primary-light: #045B8F !important;
+  --po-color-primary-dark: #045B8F !important;
+
+  border-color: #045B8F !important;
+}
+
+
+.body {
+    margin: 0;
+    min-height: 100vh;
+    width: 100vw;
+    background-image: url('/assets/FundoDN.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+.painelProcess{
+    margin-left: 10px; 
+    padding-bottom: 10px;
+}
+
+.painelProcess p{
+    color: white;
+    font-size:small;
+}
+
+.infoProcess{
+    color: white;
+    border: 1px solid white; 
+    background-color: transparent;
+     border-radius: 4px; 
+     margin-top: 10px; 
+     margin-right: 10px;
+     padding:5px;
+     text-align: center;
+     
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.po-table td {
+    padding: 2px 5px !important;
+}
