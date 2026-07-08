@@ -151,7 +151,7 @@ po-table {
     
     gap: 12px;                /* espaço entre blocos */
     align-items: stretch;     /* ocupa largura total */
-    
+    align-items: flex-start;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
     border: 1px solid gray; 
     border-radius: 4px; 
@@ -159,6 +159,10 @@ po-table {
     background-color: whitesmoke;
     width: 100%;
     height: auto;             /* 👈 remove altura fixa */
+}
+
+.campofiltros po-button {
+  margin-top: 24px; /* ajuste fino (20~28 dependendo do tema) */
 }
 
 .botoes-acoes {

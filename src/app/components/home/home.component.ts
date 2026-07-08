@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation, inject, signal } from '@angular/core';
 import { PoMenuItem, PoModalAction, PoModalComponent, PoPageAction, PoRadioGroupOption, PoStepperComponent, PoTableAction, PoTableColumn, PoTableComponent, PoNotificationService, PoDialogService, PoNotification, PoButtonComponent, PoLoadingModule, PoStepperModule, PoWidgetModule, PoDividerModule, PoFieldModule, PoIconModule, PoTableModule, PoButtonModule, PoTooltipModule, PoRadioGroupModule, PoModalModule, PoModule, PoAccordionModule, PoTableLiterals, PoStepComponent, PoContainerModule, PoComboOption, PoPageModule, PoToolbarModule, PoToolbarAction, PoLookupColumn } from '@po-ui/ng-components';
 import { TotvsService } from '../../services/totvs-service.service'
-import { catchError, delay, elementAt, finalize, first, forkJoin, interval, of, Subscription } from 'rxjs';
+import { catchError, delay, elementAt, filter, finalize, first, forkJoin, interval, of, Subscription, tap } from 'rxjs';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ExcelService } from '../../services/excel-service.service';
 import { Usuario } from '../../interfaces/usuario';
@@ -22,16 +22,16 @@ import { DnModal } from "../../dn-modal/dn-modal";
   styleUrls: ['./home.component.css'],
   standalone: true,
   imports: [
-    PoLoadingModule,    PoStepperModule,
-    PoWidgetModule,    PoDividerModule,
-    PoFieldModule,    CommonModule,
-    FormsModule,    ReactiveFormsModule,
-    PoIconModule,    PoTableModule,
-    PoButtonModule,    PoTooltipModule,
-    PoRadioGroupModule,    PoModalModule,
-    PoAccordionModule,    PoContainerModule,
-    PoPageModule,    PoToolbarModule,
-    DnRangeComponent,    DnModal
+    PoLoadingModule, PoStepperModule,
+    PoWidgetModule, PoDividerModule,
+    PoFieldModule, CommonModule,
+    FormsModule, ReactiveFormsModule,
+    PoIconModule, PoTableModule,
+    PoButtonModule, PoTooltipModule,
+    PoRadioGroupModule, PoModalModule,
+    PoAccordionModule, PoContainerModule,
+    PoPageModule, PoToolbarModule,
+    DnModal, RpwComponent
 ]
 })
 export class HomeComponent {
@@ -39,8 +39,8 @@ export class HomeComponent {
   private srvheader       = inject(TecLabLookupService)
 
   //--- Loadings
-  loadTela:  boolean = false
-  loadExcel: boolean = false
+  loadTela:        boolean = false
+  loadExcel:       boolean = false
   labelLoadTela:    string = ''
   loadTecnico:      string = ''
   loadTransp:       string = ''
@@ -56,6 +56,7 @@ export class HomeComponent {
   //---Grid
   colunas!: PoTableColumn[]
   lista!:   any[]
+  selectedItems: any[] = []
 
   //--- Controle de Steps
   StepAtual:        any
@@ -151,6 +152,7 @@ export class HomeComponent {
   dthrAlt:                     Date   = new Date()
   currentStep                  = '' // etapa atual
   previousStep                 = ''
+  filtroPronto:                boolean = false
 
   //--- Modal Resumo
   consolidacao:       any
@@ -173,6 +175,7 @@ export class HomeComponent {
   //Filtros Avançados
   filtro = {
     
+    lLog: false,
     valEstabIni: "",
     valEstabFim: "ZZZ",
     cLabelCodEstabel: "Estabelecimento",
@@ -188,6 +191,8 @@ export class HomeComponent {
   }
 
   filtroPadrao = {
+    
+    lLog: false,
     
     valEstabIni: "",
     valEstabFim: "ZZZ",
@@ -291,13 +296,8 @@ export class HomeComponent {
   //--- Limpar Filtros
   limparFiltros(){
 
-    //this.filtro = { ...this.filtroPadrao }
-    this.codEstabelecimento = ""
-    this.codEmitente        = ""
-    this.serie              = ""
-    this.nrNotaFis          = ""
-    this.qtd                = ""
-    this.listaReparos       = []
+    this.filtro = { ...this.filtroPadrao }
+    
   }
 
   dtIni: string = <any>new Date();
@@ -333,7 +333,7 @@ export class HomeComponent {
 
   //Filtro Avançado
   onFiltroAvancado(){
-    //this.telaFiltroAvancado?.open()
+    this.telaFiltroAvancado?.open()
   }
 
   //Listagem em Excel
@@ -363,26 +363,40 @@ export class HomeComponent {
     this.loadExcel = false
   }
 
-  Selecionar(){
+  onValidar(): boolean{
 
     if (!this.codEstabelecimento) {
-      this.srvNotification.warning('Informe o Estabelecimento.');
-      return;
+      this.srvNotification.warning('Informe o Estabelecimento.')
+      return false
     }
 
     if (!this.codEmitente) {
-      this.srvNotification.warning('Informe o Emitente.');
-      return;
+      this.srvNotification.warning('Informe o Emitente.')
+      return false
     }
 
     if (!this.nrNotaFis) {
-      this.srvNotification.warning('Informe a NF.');
-      return;
+      this.srvNotification.warning('Informe a NF.')
+      return false
     }
 
     if (!this.serie) {
-      this.srvNotification.warning('Informe a Série.');
-      return;
+      this.srvNotification.warning('Informe a Série.')
+      return false
+    }
+
+    return true
+  }
+
+  restoreColumn() {
+    //this.columns = this.columnsDefault;
+  }
+
+  Selecionar(){
+
+    //--- Valida dados
+    if (!this.onValidar()) {
+      return
     }
 
     //const valor = Number(this.qtd)
@@ -412,13 +426,28 @@ export class HomeComponent {
         }
         
         this.listaReparos = [...response.items] // força nova referência
+        
+        this.listaReparos = (response.items || []).map((item: any) => ({...item, $selected: true}))
+
+        setTimeout(() => {
+          this.grid2.selectAll = true 
+          this.total = this.grid2.getSelectedRows().length
+        })
+
         this.loadTela     = false
 
         this.qtd = response.items.length
+        this.filtroPronto      = false // Bloqueia Filtros
         this.cdr.detectChanges()
     },
-      complete: ()=> {this.loadTela=false},
-      error: ()=> {this.loadTela=false}
+      complete: ()=> { 
+                        this.filtroPronto      = false // Bloqueia Filtros 
+                        this.loadTela=false
+                      },
+      error: ()=> {
+                    this.filtroPronto      = false // Bloqueia Filtros
+                    this.loadTela=false
+                  }
     })
 
   }
@@ -427,8 +456,8 @@ export class HomeComponent {
   ngOnInit(): void {
 
     this.versao = environment.versao
-    this.totSelecionado[3] = "Calcular"
-    this.totSelecionado[4] = "Calcular"
+    
+    this.filtroPronto      = true // Libera Filtros
 
     //Obter Colunas do Grid
     this.colunasReparos          = this.srvTotvs.obterColunasReparos()
@@ -473,7 +502,14 @@ export class HomeComponent {
   //--- Abrir tela de Resumo Final
   AbrirTela(obj:any, cTela:string){
       this.loadTela=true
-      this.router.navigate([cTela], { state: { consolidacao: obj.nrConsolidacao } })
+      this.router.navigate([cTela], { 
+                                      queryParams: {
+                                          estabelecimento: this.codEstabelecimento,
+                                          emitente: this.codEmitente,
+                                          nf: this.nrNotaFis,
+                                          serie: this.serie
+                                        }
+                                    })
     }
 
   //--- Chame este método sempre que o grid for recarregado/atualizado.
@@ -538,20 +574,135 @@ export class HomeComponent {
   //--- Confirmar Documento
   onConfirmar(){
 
+    //--- Valida dados
+    if (!this.onValidar()) {
+      return
+    }
+
+    if (this.grid2.getSelectedRows().length <= 0) {
+      this.srvNotification.warning('Nenhum reparo foi selecionado, verifique!')
+      return
+    }
+
     this.mostrarModal = true
 
   }
 
-  public onConfirmarExclusao(confirmado: boolean){
+  private subAcompanhamento: any
+  finalizarFluxo() {
+    if (this.subAcompanhamento) {
+      this.subAcompanhamento.unsubscribe()
+    }
+
+    this.onResumoFinal('ok')
+  }
+
+  public onConfirmarModal(confirmado: boolean) {
 
     this.mostrarModal = false
 
-    if (confirmado) {
-    
-      this.onResumoFinal('ok')
-    }
+    //Inicializar acompanhamento rpw
+    this.numPedExec.update(() => 1)
 
+    const params = {
+                    params: [{
+                      codEstabelecimento: this.codEstabelecimento,
+                      codEmitente:        this.codEmitente,
+                      nrNotaFis:          this.nrNotaFis,
+                      serie:              this.serie,
+                      ativaLog:           this.filtro.lLog
+                    }],
+                    items: this.grid2.getSelectedRows()
+    }
     
+    this.subAcompanhamento = this.srvTotvs.onConclusaoRep(params)
+      .pipe(
+        tap(() => this.loadTela = false),
+        filter((response: any) => response?.concluidos?.length > 0)
+      )
+      .subscribe({
+        next: (response: any) => {
+
+          if (response?.pedExec !== undefined) {
+            this.numPedExec.update(() => response.pedExec);
+          } else {
+            this.numPedExec.update(() => 0);
+          }
+
+          // ✅ terminou o processo
+          if (response.status === 'FINALIZADO') {
+            this.finalizarFluxo();
+          }
+
+        },
+        error: (err) => {
+          this.loadTela = false;
+          this.srvNotification.error('Erro no acompanhamento');
+        }
+      });
+
+    /*FAS
+    this.srvTotvs.onConclusaoRep(params)
+      .pipe(
+        tap(() => this.loadTela = false), // sempre desliga loading
+        filter((response: any) => response?.concluidos?.length > 0), // só continua se tiver dados
+        finalize(() => {
+
+          if (confirmado) {
+            this.onResumoFinal('ok')
+          }
+
+        })
+      )
+      .subscribe({ 
+        next: (response: any) => {
+
+          if (response && response.concluidos && response.concluidos.length > 0) {
+
+            //this.listaConsolidaItens = response.consolidar
+            //Ordena a Lista
+            //this.listaConsolidaItens = (this.listaConsolidaItens as any[]).sort(this.ordenarCampos(['nrConsolidacao']))
+            if (confirmado) {
+              //this.loadTela = false
+              this.srvNotification.success("Pedido de Execução [" + response.pedExec + "] gerado")
+            
+              //Acompanhar rpw
+              if (response.pedExec !== undefined){
+                  this.numPedExec.update(() => response.pedExec)
+              }
+              else {
+                  this.numPedExec.update(() => 0)
+              }               
+            }
+          }
+
+          this.loadTela = false
+        },
+        error: (err) => {
+
+          this.loadTela = false
+
+          let mensagem = 'Erro ao executar a operação'
+
+          if (err.status === 400) {
+            mensagem = 'Serviço [onConclusaoRep] não encontrado no backend.'
+          } else if (err.status === 404) {
+            mensagem = 'Requisição inválida. Verifique os parâmetros.'
+          } else if (err.error?.message) {
+            mensagem = err.error.message
+          }
+
+          this.srvNotification.error(mensagem);
+          return
+        },
+        complete: () => {
+          //if (confirmado) {
+          //  this.onResumoFinal('ok')
+          //}
+        }
+
+      })*/
+
   }
 
   //--- Relatório
@@ -588,7 +739,7 @@ export class HomeComponent {
         if (this.labelContadores[0] === "0") { return } //Não abre se não tiver dados
         
         this.tituloDetalhe = `Visão Total: ${this.labelContadores[0]} registros`
-        this.colunasDetalhe = this.srvTotvs.obterColunasTotal()
+        //this.colunasDetalhe = this.srvTotvs.obterColunasTotal()
         
         this.limparFiltro()
 
@@ -600,7 +751,7 @@ export class HomeComponent {
         if (this.labelContadores[4] === "0") { return } //Não abre se não tiver dados
 
         this.tituloDetalhe = `Visão Pendentes: ${this.labelContadores[4]} registros`
-        this.colunasDetalhe = this.srvTotvs.obterColunasTotal()
+        //this.colunasDetalhe = this.srvTotvs.obterColunasTotal()
         
         this.limparFiltro()
 
@@ -612,7 +763,7 @@ export class HomeComponent {
         if (this.labelContadores[5] === "0") { return } //Não abre se não tiver dados
 
         this.tituloDetalhe = `Visão Consolidado: ${this.labelContadores[5]} registros`
-        this.colunasDetalhe = this.srvTotvs.obterColunasTotal()
+        //this.colunasDetalhe = this.srvTotvs.obterColunasTotal()
         
         this.limparFiltro()
 

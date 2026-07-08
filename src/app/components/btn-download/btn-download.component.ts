@@ -1,4 +1,4 @@
-import { booleanAttribute, Component, inject, Input, OnInit } from '@angular/core'
+import { booleanAttribute, ChangeDetectorRef, Component, inject, Input, OnInit } from '@angular/core'
 import { environment } from '../../environments/environment'
 import { NgIf } from '@angular/common'
 import { TotvsService } from '../../services/totvs-service.service'
@@ -15,6 +15,8 @@ import { TotvsService } from '../../services/totvs-service.service'
 export class BtnDownloadComponent {
   private srvTotvs = inject(TotvsService)
   
+  constructor(private cdr:      ChangeDetectorRef) {}
+
   @Input() nomeArquivo: string=''
   @Input({transform: booleanAttribute}) mostrarNomeArquivo: boolean=true
   
@@ -22,9 +24,10 @@ export class BtnDownloadComponent {
 
   ngOnInit(): void {
     
-    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: 'BPD'}).subscribe({
+    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: '_esrr047'}).subscribe({
         next: (response: any) => {
           this.urlSpool = response.desc
+          this.cdr.detectChanges()
         }
     })
     

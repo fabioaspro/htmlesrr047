@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, effect, EventEmitter, inject, input, Input, output, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, effect, EventEmitter, inject, input, Input, output, Output, ViewChild } from '@angular/core';
 import { PoModalAction, PoModalComponent, PoModalModule } from '@po-ui/ng-components'
 import { interval, Observable, Subscription } from 'rxjs'
 import { TotvsService } from '../../services/totvs-service.service'
@@ -20,13 +20,16 @@ export class RpwComponent {
   private srvTotvs = inject(TotvsService);
 
   //Signals variaveis
-  numPedExec = input(0)
-  tentativas = input(2)
-  intervalo = input(500)
-  terminoEvent = output<boolean>();
+  numPedExec   = input(0)
+  tentativas   = input(2)
+  intervalo    = input(500)
+  terminoEvent = output<boolean>()
 
   //Tela Modal
   @ViewChild('timer', { static: true }) telaTimer: | PoModalComponent | undefined
+
+  
+  @Output() finalizar = new EventEmitter<string>()
 
   //Variaveis locais
   sub!:Subscription
@@ -36,9 +39,10 @@ export class RpwComponent {
   telaTimerFoiFechada:boolean = false
 
   //contructor
-  constructor(){
+  constructor(private cdr:      ChangeDetectorRef,){
     effect(() => {
      
+      this.cdr.detectChanges()
       //Num Pedido Exec igual a 0 - Fecha a tela 
       if (this.numPedExec() === 0) {
         this.telaTimer?.close()
@@ -56,6 +60,7 @@ export class RpwComponent {
         this.sub = interval(this.intervalo()).subscribe(n => {
            this.labelPedExec = 'Pedido Execução: ' + this.numPedExec() + ' (' + (n * 5).toString() + 's)'
            this.labelTimer   = 'Aguarde geração do arquivo'
+           this.cdr.detectChanges()
 
            //Controle de Numero de Tentativas
            if (n > this.tentativas()){
@@ -74,6 +79,7 @@ export class RpwComponent {
                  this.labelTimerDetail        = "Utilize o Log de Arquivos para visualizar o arquivo gerado"
                  this.acaoCancelarTimer.label = 'Fechar'
                  this.terminoEvent.emit(true)
+                 this.cdr.detectChanges()
                }
              }
            })
@@ -96,6 +102,7 @@ export class RpwComponent {
     }
     this.telaTimer?.close()
     this.telaTimerFoiFechada=true
+    this.finalizar.emit('ok'); // ✅ emite pro pai
   }
 
 

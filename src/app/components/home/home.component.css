@@ -8,6 +8,38 @@
     
 }
 
+
+.filtro-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 4px;
+}
+
+/* Organização dos filtros */
+.filtro-grupo {
+  display: flex;
+  align-items: center;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Área de ações */
+.acoes {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 12px;
+}
+
+.secao-titulo {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
 po-button {
   white-space: nowrap;
 }

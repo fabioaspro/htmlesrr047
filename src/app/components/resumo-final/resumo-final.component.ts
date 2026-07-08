@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { PoDialogService, PoNotificationService, PoTableColumn, PoTableLiterals, PoLoadingModule, PoWidgetModule, PoButtonModule, PoTableModule, PoModalModule, PoModalComponent, PoModalAction, PoFieldModule, PoIconModule, PoLookupColumn } from '@po-ui/ng-components';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PoDialogService, PoNotificationService, PoTableColumn, PoTableLiterals, PoLoadingModule, PoWidgetModule, PoButtonModule, PoTableModule, PoModalModule, PoModalComponent, PoModalAction, PoFieldModule, PoIconModule, PoLookupColumn, PoGridModule } from '@po-ui/ng-components';
 import { TotvsService } from '../../services/totvs-service.service';
 import { TotvsService46 } from '../../services/totvs-service-46.service';
 import { Usuario } from '../../interfaces/usuario';
@@ -18,16 +18,23 @@ import { TecLabLookupService } from '../../services/header-lookup.service';
     templateUrl: './resumo-final.component.html',
     styleUrl: './resumo-final.component.css',
     standalone: true,
-    imports: [NgIf, PoLoadingModule, FormsModule,    ReactiveFormsModule, PoWidgetModule, CommonModule, PoButtonModule, PoTableModule, BtnDownloadComponent, PoModalModule, NgClass, RpwComponent, PoFieldModule, PoIconModule]
+    imports: [NgIf, PoLoadingModule, PoGridModule, 
+      FormsModule,    
+      ReactiveFormsModule, PoWidgetModule, CommonModule, 
+      PoButtonModule, 
+      PoTableModule, BtnDownloadComponent, PoModalModule, 
+      NgClass, RpwComponent, PoWidgetModule , 
+      PoFieldModule  , 
+      PoFieldModule, PoIconModule]
+
 })
 export class ResumoFinalComponent implements OnInit {
-  private srvTotvs   = inject(TotvsService)
-  private srvheader  = inject(TecLabLookupService)
-  private srvTotvs46 = inject(TotvsService46)
-  private srvDialog  = inject(PoDialogService)
+  private srvTotvs        = inject(TotvsService)
+  private srvheader       = inject(TecLabLookupService)
+  private srvTotvs46      = inject(TotvsService46)
+  private srvDialog       = inject(PoDialogService)
   private srvNotification = inject(PoNotificationService)
-  private router = inject(Router)
-
+  private router          = inject(ActivatedRoute)
 
   constructor(private cdr:      ChangeDetectorRef) {}
               
@@ -44,7 +51,10 @@ export class ResumoFinalComponent implements OnInit {
   codEmitente:                 string = ''
   nrNotaFis:                   string = '' 
   serie:                       string = ''
-  qtd:                         string = ''
+  cMensagemErroRPW                    = ''
+  cMensagemErroRPWReparo              = ''
+
+  filtroPronto: boolean = false
 
   EmitenteService             = this.srvheader
 
@@ -59,17 +69,30 @@ export class ResumoFinalComponent implements OnInit {
   urlInfoOs:string=''
   urlSpool:string=''
   listaArquivos!:any[]
+  listaRepBRR: any[] = []
+  listaArquivosConf:any[] = []
+
   colunasArquivos!: PoTableColumn[]
+  colunasBRR!: PoTableColumn[]
+
   nrProcess:string=''
   codEstabel:string=''
   loadTela:boolean=false
+  loadTelaConf:boolean=false
+  loadTelaRep:boolean=false
 
-  labelTimer:string='Aguarde a liberação do arquivo...'
-  labelTimerDetail:string=''
+  labelLoadTela:string='Aguarde a liberação do arquivo...'
   labelPedExec:string=''
+  labelTimer:string=''
+  labelTimerDetail:string=''
   telaTimerFoiFechada:boolean=false
-  sub!: Subscription;
+  sub!: Subscription
   
+  customLiteralsArq: PoTableLiterals = {
+    noData: 'Infome os filtros para Buscar os Dados',
+    loadMoreData: 'Carregar mais',
+    loadingData: 'Buscando Arquivo '
+  }
   
   acaoCancelarTimer: PoModalAction = {
     action: () => {
@@ -96,10 +119,141 @@ export class ResumoFinalComponent implements OnInit {
   }).reduce((p, n) => p ? p : n, 0)
   //--- Função para Ordenar
 
+  Selecionar(){
+
+    if (!this.codEstabelecimento) {
+      this.srvNotification.warning('Informe o Estabelecimento.')
+      return
+    }
+
+    if (!this.codEmitente) {
+      this.srvNotification.warning('Informe o Emitente.')
+      return
+    }
+
+    if (!this.nrNotaFis) {
+      this.srvNotification.warning('Informe a NF.')
+      return
+    }
+
+    if (!this.serie) {
+      this.srvNotification.warning('Informe a Série.')
+      return
+    }
+
+    this.loadTelaConf      = true
+    this.filtroPronto      = false // Bloqueia Filtros
+    this.listaArquivosConf = []
+    this.listaRepBRR       = []
+
+    this.cdr.detectChanges()
+
+    //Arquivo Gerado Conferencia
+    let paramsTela = this.codEstabelecimento + this.codEmitente + this.nrNotaFis //+ this.serie
+
+    let params:any={nrProcess: paramsTela, situacao:'ESRR047'}
+    this.srvTotvs.ObterArquivo(params).subscribe({
+      next:(item:any)=>{
+        if(item === null) return
+        this.listaArquivosConf = item.items ?? null
+
+        let paramsrpw:any={iPedExec: item.items[0].numPedExec}
+        this.srvTotvs.onObterRPW(paramsrpw).subscribe({
+          next:(response:any)=>{
+            this.cMensagemErroRPW = "Pedido: " + item.items[0].numPedExec + " - " + response.cpedExec  //response.rpw[0].mensagemRPW
+            this.cdr.detectChanges()
+          },
+          error: (e) => {
+            this.srvNotification.error(e.message)
+            return
+          }
+        })
+
+      },
+      error: (e) => {
+        this.srvNotification.error(e.message)
+        return
+      },
+      complete: () => { 
+        this.loadTelaConf = false
+        this.cdr.detectChanges()
+      }
+    })
+
+    let paramsReparos:any={nrProcess: paramsTela, situacao:'ESRR047REP'}
+    this.srvTotvs.ObterArquivo(paramsReparos).subscribe({
+      next:(item:any)=>{
+        if(item === null) return
+        //this.listaArquivosConf = item.items ?? null
+
+        let paramsrpwReparo:any={iPedExec: item.items[0].numPedExec}
+        this.srvTotvs.onObterRPW(paramsrpwReparo).subscribe({
+          next:(response:any)=>{
+            this.cMensagemErroRPWReparo = "Pedido: " + item.items[0].numPedExec + " - " + response.cpedExec  //response.rpw[0].mensagemRPW
+            this.cdr.detectChanges()
+          },
+          error: (e) => {
+            this.srvNotification.error(e.message)
+            return
+          }
+        })
+      },
+      error: (e) => {
+        this.srvNotification.error(e.message)
+        return
+      },
+      complete: () => { 
+        this.loadTelaConf = false
+        this.cdr.detectChanges()
+      }
+    })
+
+    //Arquivo Gerado Reparos - aqui carregar lista do que fez BRR
+    this.loadTelaRep       = true
+    let paramsRep: any = {items: [{codEstabelecimento: this.codEstabelecimento,
+                                    codEmitente: this.codEmitente,
+                                    nrNotaFis: this.nrNotaFis,
+                                    serie: this.serie
+                                  }
+                                  ]
+                          }
+    this.srvTotvs.ObterBRR(paramsRep).subscribe({
+      next:(item:any)=>{
+        if(item === null) return
+        this.listaRepBRR = item.repBRR ?? null
+      },
+      error: (e) => {
+        this.srvNotification.error(e.message)
+        this.filtroPronto       = true // ✅ liberou a tela
+        return
+      },
+      complete: () => { 
+        this.loadTelaRep   = false
+        this.filtroPronto  = true // ✅ liberou a tela
+        this.cdr.detectChanges() 
+      }
+    })    
+
+  }
+
+  //--- Limpar Filtros
+  limparFiltros(){
+
+    //this.filtro = { ...this.filtroPadrao }
+    this.codEstabelecimento = ""
+    this.codEmitente        = ""
+    this.serie              = ""
+    this.nrNotaFis          = ""
+    this.listaArquivosConf  = []
+  }
+
    //---Inicializar
    ngOnInit(): void {
 
-    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: ''}).subscribe({
+    this.filtroPronto = false // Bloqueia Filtros
+    this.cdr.detectChanges()
+
+    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: '_esrr047'}).subscribe({
         next: (response: any) => {
           this.urlSpool = response.desc
         }})
@@ -121,44 +275,61 @@ export class ResumoFinalComponent implements OnInit {
         return
       },
       complete: () => {
-        /*
-        //FAS - Aqui apagar depois
-        this.codEstabelecimento = "101"
-        this.onEstabChange(this.codEstabelecimento)
-        this.stepper.next()
-        this.stepper.next()
-        this.stepper.next()
-        this.stepper.next()
-        this.dthrAlt = new Date(2025, 10, 24)
-        //FAS - Aqui apagar depois
-        */
+          this.router.queryParams.subscribe(params => {
+          this.codEstabelecimento = params['estabelecimento'] || '';
+          this.codEmitente        = params['emitente'] || '';
+          this.nrNotaFis          = params['nf'] || '';
+          this.serie              = params['serie'] || '';
+
+          this.cdr.detectChanges()
+
+          if (this.codEstabelecimento && this.codEmitente) {
+            this.Selecionar()
+          }
+        })
+
+        this.filtroPronto       = true // ✅ liberou a tela
+        
       }
 
     })
     this.colunasArquivos = this.srvTotvs.obterColunasArquivos()
+    this.colunasBRR      = this.srvTotvs.obterColunasBRR()
+    
+    /*
+    //Arquivo Gerado Conferencia
+    this.loadTelaConf = true
+    this.loadTelaRep  = true
+    let params:any={nrProcess: '', situacao:'C'}
+    this.srvTotvs.ObterArquivo(params).subscribe({
+      next:(item:any)=>{
+        if(item === null) return
+        this.listaArquivosConf = item.items ?? null
+      },
+      complete: () => { 
+        this.loadTelaConf = false
+        this.loadTelaRep  = false
+        this.cdr.detectChanges() 
+      }
+    })
+    */
 
-    //--- Login Unico
-    this.srvTotvs.ObterUsuario().subscribe({
-      next:(response:Usuario)=>{
-        
-       
-        if (response === undefined){
-          this.srvTotvs.EmitirParametros({estabInfo:''})
-        }
-        else{
-          this.nrProcess  = response.nrProcesso
-          this.codEstabel = response.codEstabelecimento
+    /*
+    //Arquivo Gerado Reparos
+    let paramsRep:any={nrProcess: '', situacao:'R'}
+    this.srvTotvs.ObterArquivo(paramsRep).subscribe({
+      next:(item:any)=>{
+        if(item === null) return
+        this.listaRepBRR = item.items ?? null
+      },
+      complete: () => { 
+        this.loadTelaRep = false
+        this.cdr.detectChanges() 
+      }
+    })
+    */
 
-          //Arquivo Gerado
-          let params:any={nrProcess: response.nrProcesso, situacao:'L'}
-          this.srvTotvs.ObterArquivo(params).subscribe({
-            next:(item:any)=>{
-              if(item === null) return
-              this.listaArquivos = item.items ?? null
-            }
-          })
-
-      }}})
+    this.cdr.detectChanges() 
 
   }
 

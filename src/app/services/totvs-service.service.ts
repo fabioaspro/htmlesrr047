@@ -47,26 +47,26 @@ export class TotvsService {
   obterColunasReparos(): Array<PoTableColumn> { //colunasDetalhe
     return [
       { property: 'conclui',       label: 'Conclui?',  visible: false},
-      { property: 'rr-bloq',       label: 'Bloq' },
+      { property: 'rr-bloq',       label: 'Bloq', visible: true },
       { property: 'cod-estabel',   label: 'Estabel', visible: false},
-      { property: 'CodFilial',     label: 'Filial' },
-      { property: 'NumRR',         label: 'Num.RR' },
-      { property: 'it-codigo',     label: 'Item'},
-      { property: 'descItem',      label: 'Descrição'},
-      { property: 'cliOrig',       label: 'CliOrig', },
-      { property: 'cliDest',       label: 'CliDest' },
-      { property: 'numSerie',      label: 'numSerie' },
-      { property: 'dataRecebe',    label: 'Dt.Recebe' },
-      { property: 'horaRecebe',    label: 'Hr.Recebe' },
-      { property: 'nrNotaFis',     label: 'NF' },
-      { property: 'dtSaida',       label: 'Dt.Saida' },
-      { property: 'requisicao',    label: 'Requisição' },
-      { property: 'atividade',     label: 'Atividade' },
-      { property: 'defInd',        label: 'Def.Ind.' },
-      { property: 'numOs',         label: 'Num.OS' },
-      { property: 'numTec',        label: 'Num.Tec' },
-      { property: 'situacao',      label: 'Situação' },
-      { property: 'obs',           label: 'Obs' },
+      { property: 'CodFilial',     label: 'Filial', visible: true },
+      { property: 'NumRR',         label: 'Num.RR', visible: true },
+      { property: 'it-codigo',     label: 'Item', visible: true},
+      { property: 'descItem',      label: 'Descrição', visible: true},
+      { property: 'cliOrig',       label: 'CliOrig', visible: true },
+      { property: 'cliDest',       label: 'CliDest', visible: true },
+      { property: 'numSerie',      label: 'numSerie', visible: true },
+      { property: 'dataRecebe',    label: 'Dt.Recebe', visible: true },
+      { property: 'horaRecebe',    label: 'Hr.Recebe', visible: true },
+      { property: 'nrNotaFis',     label: 'NF', visible: true },
+      { property: 'dtSaida',       label: 'Dt.Saida', visible: true },
+      { property: 'requisicao',    label: 'Requisição', visible: true },
+      { property: 'atividade',     label: 'Atividade', visible: true },
+      { property: 'defInd',        label: 'Def.Ind.', visible: true },
+      { property: 'numOs',         label: 'Num.OS', visible: true },
+      { property: 'numTec',        label: 'Num.Tec', visible: true },
+      { property: 'situacao',      label: 'Situação', visible: true },
+      { property: 'obs',           label: 'Obs', visible: true },
 
       //{ property: 'qtdItens',      label: 'Qtd.Itens',     visible: false, width: '100px' },
       //{ property: 'vlItens',       label: 'Vl.Itens',      visible: false, type: 'currency', format: 'BRL' },      
@@ -75,10 +75,21 @@ export class TotvsService {
 
   obterColunasArquivos(): Array<PoTableColumn> {
     return [
-      {property: 'nomeArquivo', label: "Arquivo", type: 'columnTemplate'},
-      {property: 'mensagem', label: "Descrição"},
-      {property: 'dataHora', label: "Data", type:'date', format: "dd/MM/yyyy hh:mm:ss"},
-      {property: 'numPedExec', label: "PedExec"},
+      {property: 'nomeArquivo', label: "Arquivo",  type: 'columnTemplate'},
+      {property: 'mensagem',    label: "Descrição"},
+      {property: 'dataHora',    label: "Data",     type:'date', format: "dd/MM/yyyy hh:mm:ss"},
+      {property: 'numPedExec',  label: "PedExec"},
+    ];
+  }
+
+  obterColunasBRR(): Array<PoTableColumn> {
+    return [
+      {property: 'filAnt',      label: "Filial Anterior"},
+      {property: 'numrrAnt',    label: "Reparo Anterior"},
+      {property: 'serieAnt',    label: "Série Anterior"},
+      {property: 'filAtu',      label: "Filial Atual"},
+      {property: 'numrrAtu',    label: "Reparo Atual"},
+      {property: 'serieAtu',    label: "Série Atual"},
     ];
   }
 
@@ -89,10 +100,24 @@ export class TotvsService {
   }
 
   public ObterArquivo(params?: any){
-    return this.http.get(`${this._url}/ObterArquivo`, {params:params, headers:headersTotvs}).pipe(take(1));
+    return this.http.get(`${this._urlGeral}/ObterArquivo`, {params:params, headers:headersTotvs}).pipe(take(1));
+  }
+  
+  public onObterRPW(params?: any){
+    return this.http.post(`${this._urlGeral}/ObterRPW`, params, {headers:headersTotvs}).pipe(take(1))  
+  }
+  
+  public ObterBRR(params?: any){
+    return this.http.post(`${this._url}/ObterBRR`, params, {headers:headersTotvs}).pipe(take(1))  
+  }
+
+  //---Concluir Reparo
+  public onConclusaoRep(params?: any){
+    return this.http.post(`${this._url}/onConclusaoRep`, params, {headers:headersTotvs}).pipe(take(1))  
   }
   //------------ ESRR047
 
+  
   //------------ Coluna Grid Detalhe
   obterColunasTotal(): Array<PoTableColumn> { //colunasDetalhe
     return [

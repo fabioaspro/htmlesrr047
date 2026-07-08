@@ -4,9 +4,9 @@
 
 <app-dn-modal
                 [visible]="mostrarModal"
-                title="Confirmar Documento ?"
+                title="Confirma Conclusão dos Reparos ?"
                 [message]="mensagemModal"
-                (confirm)="onConfirmarExclusao($event)">
+                (confirm)="onConfirmarModal($event)">
   </app-dn-modal>
 
 <div class="cabec">
@@ -18,7 +18,8 @@
                     (p-change)="onEstabChange($event)" 
                     p-clean="true" 
                     [p-options]="listaEstabelecimentos"
-            
+                    [p-disabled]="!filtroPronto"
+
                     p-label="Estabelecimento" 
                     p-icon="bi bi-pin-map" 
                     [p-placeholder]="placeHolderEstabelecimento">
@@ -42,7 +43,7 @@
                           p-placeholder="Selecione um Emitente"
                           changeVisibleColumns="['codEmitente', 'nomeAbrev']"
                           [p-field-format]="['codEmitente', 'nomeAbrev']"
-                          
+                          [p-disabled]="!filtroPronto"
                           [p-columns]="columns"
                           [p-filter-service]="EmitenteService"                    
                           [p-literals]="{ 'modalTitle': 'Zoom de Emitente' }"
@@ -51,8 +52,8 @@
                           (p-change)="onEmitenteChange($event)"                
                         >
                 </po-lookup>
-        <po-input class="po-md-6" name="nrNotaFis" [(ngModel)]="nrNotaFis" p-placeholder="NF"              p-label="NF"              p-required [p-maxlength]="7"></po-input>
-        <po-input class="po-md-6" name="serie"     [(ngModel)]="serie"     p-placeholder="Serie"           p-label="Serie"           p-required [p-maxlength]="3"></po-input>
+        <po-input class="po-md-6" name="nrNotaFis" [(ngModel)]="nrNotaFis" p-placeholder="NF"              p-label="NF"              p-required [p-maxlength]="7" [disabled]="!filtroPronto"></po-input>
+        <po-input class="po-md-6" name="serie"     [(ngModel)]="serie"     p-placeholder="Serie"           p-label="Serie"           p-required [p-maxlength]="3" [disabled]="!filtroPronto"></po-input>
         <po-input class="po-md-6" name="qtd"       [(ngModel)]="qtd"       p-placeholder="Qtd"             p-label="Qtd"             p-required [p-maxlength]="7" p-disabled="true"></po-input>
 
     
@@ -74,10 +75,11 @@
   
   <p style="font-size: 15px; font-weight: bold; margin-bottom: -20px;">Reparos Selecionados: {{this.total}}</p>
 
-  <p style="font-size: 15px; display: flex; justify-content: flex-end; margin-right: 260px; margin-bottom: -40px;">        
+  <p style="font-size: 15px; display: flex; justify-content: flex-end; margin-right: 300px; margin-bottom: -40px;">        
     <po-button  p-tooltip="Listagem em Excel"  p-icon="an an-microsoft-excel-logo"  p-label=""  (p-click)="onExcel()"          p-kind="primary"> </po-button>
     <po-button  p-tooltip="Pesquisa Avançada"  p-icon="bi bi-funnel"                p-label=""  (p-click)="onFiltroAvancado()" p-kind="primary"> </po-button>
-  </p>  
+  </p>
+ 
   <po-table #grid2  [p-items]="listaReparos"
                     [p-columns]="colunasReparos" 
                     [p-selectable]="true"
@@ -87,12 +89,13 @@
                     (p-all-selected)="changeOptions($event)"
                     (p-all-unselected)="changeOptions($event)"
                     [p-striped]="true" 
-                    [p-hide-table-search]="false" 
-                    [p-hide-columns-manager]="true" 
+                    
                     p-container="true" 
                     [p-height]="alturaGrid"
                     [p-loading]="loadTela"
-                    [p-sort]="true" >
+                    [p-sort]="true"
+                    [p-hide-batch-actions]="false"
+                    [p-hide-table-search]="false">
                    <ng-template p-table-cell-template let-column="column" let-row="row">
            
                     @if(column.property === 'opcoes'){
@@ -235,26 +238,42 @@
         </form>
   </po-modal>
 
-  <po-modal #telaFiltroAvancado p-title="Filtro Avançado"
-                                p-size="md" 
-                                p-click-out="false" 
-                                [p-hide-close]="true"
-                                [p-primary-action]="acaoConfirmarFiltro" 
-                                [p-secondary-action]="acaoCancelarFiltro">
-      
-      <form [formGroup]="formNota">
-        
-          <div class="filtroAvancado">
-         
-            <dn-range [cLabel]="filtro.cLabelCodEstabel"  [(cini)]="filtro.valEstabIni"   [(cfim)]="filtro.valEstabFim"   type="text"   cmask="AAA"></dn-range>
-            <dn-range [cLabel]="filtro.cLabelCodEmit"     [(cini)]="filtro.valEmitIni"    [(cfim)]="filtro.valEmitFim"    type="number" cmask="000000000"></dn-range>
-            <dn-range [cLabel]="filtro.cLabelItem"        [(cini)]="filtro.valItemIni"    [(cfim)]="filtro.valItemFim"    type="text"   cmask="AA.AAA.AAAAA-AA"></dn-range>
-            
-          </div>        
+  
+<po-modal #telaFiltroAvancado
+          p-title="Filtro Avançado"
+          p-size="md"
+          p-click-out="false"
+          [p-hide-close]="true"
+          [p-primary-action]="acaoConfirmarFiltro"
+          [p-secondary-action]="acaoCancelarFiltro">
 
-      </form>
-    
-      <div class="limpar">
-        <po-button p-tooltip="Limpar Filtros"  p-icon="bi bi-eraser-fill" p-label="Limpar filtros" (p-click)="limparFiltros()" [p-disabled]="!filtrosAlterados"> </po-button>
-      </div>
-  </po-modal>
+  <div class="filtro-container">
+<div class="secao-titulo">Parâmetros</div>
+    <!-- Grupo de filtros -->
+    <div class="filtro-grupo">
+      <po-checkbox name="lLog"
+                   [(ngModel)]="filtro.lLog"
+                   p-label="Ativar log">
+      </po-checkbox>
+    </div>
+
+    <!-- Ações -->
+    <div class="acoes">
+      <po-button
+        p-label="Limpar filtros"
+        p-icon="bi bi-eraser"
+       
+        (p-click)="limparFiltros()"
+        [p-disabled]="!filtrosAlterados">
+      </po-button>
+    </div>
+
+  </div>
+
+</po-modal>
+
+
+  <rpw-acomp (finalizar)="onResumoFinal($event)" [numPedExec]="numPedExec()" 
+             [intervalo]="5000" 
+             [tentativas]="50">
+  </rpw-acomp>

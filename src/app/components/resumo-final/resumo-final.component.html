@@ -1,12 +1,13 @@
 <div class="sample-container">
-  <po-loading-overlay *ngIf="loadTela===true" [p-screen-lock]="true"></po-loading-overlay>
+  <po-loading-overlay *ngIf="loadTela===true" [p-text]="labelLoadTela" [p-screen-lock]="true"></po-loading-overlay>
+  
 </div>
 
 <div class="cabec">
   <div class="campofiltros">
 
     <po-combo class="combo-estab" [ngModel]="codEstabelecimento" (ngModelChange)="codEstabelecimento = $event"
-       p-clean="true" [p-options]="listaEstabelecimentos" p-label="Estabelecimento"
+       p-clean="true" [p-options]="listaEstabelecimentos" p-label="Estabelecimento" [p-disabled]="!filtroPronto"
       p-icon="bi bi-pin-map" [p-placeholder]="placeHolderEstabelecimento">
       <ng-template p-combo-option-template let-option>
         <div class="po-row">
@@ -20,22 +21,18 @@
     </po-combo>
     <po-lookup class="po-md-12" name="codEmitente" [(ngModel)]="codEmitente"
       [p-filter-params]="codigoEmitente ? { codigoEmit: codigoEmitente } : {}" p-label="Emitente"
-      [p-virtual-scroll]="true" p-placeholder="Selecione um Emitente"
+      [p-virtual-scroll]="true" p-placeholder="Selecione um Emitente" [p-disabled]="!filtroPronto"
       changeVisibleColumns="['codEmitente', 'nomeAbrev']" [p-field-format]="['codEmitente', 'nomeAbrev']"
       [p-columns]="columns" [p-filter-service]="EmitenteService" [p-literals]="{ 'modalTitle': 'Zoom de Emitente' }"
       p-field-value="codEmitente" p-clean="true" >
     </po-lookup>
     <po-input class="po-md-6" name="nrNotaFis" [(ngModel)]="nrNotaFis" p-placeholder="NF" p-label="NF" p-required
-      [p-maxlength]="7"></po-input>
+      [p-maxlength]="7" [disabled]="!filtroPronto"></po-input>
     <po-input class="po-md-6" name="serie" [(ngModel)]="serie" p-placeholder="Serie" p-label="Serie" p-required
-      [p-maxlength]="3"></po-input>
-    <po-input class="po-md-6" name="qtd" [(ngModel)]="qtd" p-placeholder="Qtd" p-label="Qtd" p-required
-      [p-maxlength]="7" p-disabled="true"></po-input>
-
-
-    <po-button p-tooltip="Buscar Dados" p-icon="bi bi-check2-circle" p-label="Buscar Dados"
-      p-kind="primary"></po-button>
-    <po-button p-tooltip="Limpar Filtros" p-icon="bi bi-eraser-fill" p-label="Limpar filtros" p-kind="primary">
+      [p-maxlength]="3" [disabled]="!filtroPronto"></po-input>
+    
+    <po-button p-tooltip="Buscar Dados"   p-icon="bi bi-check2-circle" p-label="Buscar Dados"   p-kind="primary" (p-click)="Selecionar()"></po-button>
+    <po-button p-tooltip="Limpar Filtros" p-icon="bi bi-eraser-fill"   p-label="Limpar filtros" p-kind="primary" (p-click)="limparFiltros()">
     </po-button>
   </div>
 
@@ -44,25 +41,33 @@
 <div class="cabec">
   <div class="campofiltrosc">
 
-
     <!-- TÍTULO -->
     <div class="titulo-box">
-      Geração Arquivo Conferência de Retorno de Conclusão de Reparos<span></span>
+      Geração dos Arquivos de Conferência de Retorno e Conclusão de Reparos<span></span>
     </div>
 
-
-    <!-- BOTÕES -->
+    <!-- BOTÕES 
     <div class="botoes-acoes">
-      <po-button p-label="Gerar Arquivo Conferência " p-kind="primary" p-icon="bi bi-gear" (p-click)="onImpressao()">
-      </po-button>
+      <po-button p-label="Finalizar Processo" p-icon="bi bi-check2-all" (p-click)="onFinalizar()"></po-button>
+    </div>-->
 
-      <po-button p-label="Finalizar Processo" p-icon="bi bi-check2-all" (p-click)="onFinalizar()">
-      </po-button>
+    <div style="border: 1px solid #ccc; padding: 10px;">
+      <div style="font-weight: bold; margin-bottom: 5px;">
+        Mensagem RPW
+      </div>
+      <div>
+        {{ cMensagemErroRPW }}
+      </div>
     </div>
 
-    <!-- TABELA -->
-    <po-table [p-items]="listaArquivos" [p-columns]="colunasArquivos" [p-hide-table-search]="true" p-container="true"
-      [p-hide-columns-manager]="true">
+    <!-- Arquivo de Conferencia -->
+    <po-table [p-items]="listaArquivosConf" 
+              [p-columns]="colunasArquivos" 
+              [p-hide-table-search]="true" 
+              [p-hide-columns-manager]="true"
+              [p-loading]="loadTelaConf"
+              [p-literals]="customLiteralsArq"
+              p-container="true">
 
       <ng-template p-table-column-template p-property="nomeArquivo" let-value>
         <btnDownload [nomeArquivo]="value"></btnDownload>
@@ -76,29 +81,36 @@
 
 <div class="cabec">
 
-
   <div class="campofiltrosc">
-
 
     <!-- TÍTULO -->
     <div class="titulo-box">
       Etiqueta Impressas de Reparos Trocados<span></span>
     </div>
 
-
-    <!-- BOTÕES -->
+    <!-- BOTÕES 
     <div class="botoes-acoes">
-      <po-button p-label="Gerar Arquivo Etiqueta de Reparos" p-kind="primary" p-icon="bi bi-gear"
-        (p-click)="onImpressao()">
-      </po-button>
+      <po-button p-label="Finalizar Processo" p-icon="bi bi-check2-all" (p-click)="onFinalizar()"></po-button>
+    </div>
+    -->
 
-      <po-button p-label="Finalizar Processo" p-icon="bi bi-check2-all" (p-click)="onFinalizar()">
-      </po-button>
+    <div style="border: 1px solid #ccc; padding: 10px;">
+      <div style="font-weight: bold; margin-bottom: 5px;">
+        Mensagem RPW
+      </div>
+      <div>
+        {{ cMensagemErroRPWReparo }}
+      </div>
     </div>
 
-    <!-- TABELA -->
-    <po-table [p-items]="listaArquivos" [p-columns]="colunasArquivos" [p-hide-table-search]="true" p-container="true"
-      [p-hide-columns-manager]="true">
+    <!-- Reparos -->
+    <po-table [p-items]="listaRepBRR" 
+              [p-columns]="colunasBRR" 
+              [p-hide-table-search]="true"
+              [p-hide-columns-manager]="true"
+              [p-loading]="loadTelaRep"
+              [p-literals]="customLiteralsArq"
+               p-container="true">
 
       <ng-template p-table-column-template p-property="nomeArquivo" let-value>
         <btnDownload [nomeArquivo]="value"></btnDownload>
@@ -109,7 +121,6 @@
   </div>
 
 </div>
-
 
 <po-modal #timer [p-title]=labelPedExec p-size="sm" p-click-out="false" [p-hide-close]="true" [p-hide-close]="true"
   [p-primary-action]="acaoCancelarTimer">
