@@ -1,0 +1,294 @@
+::ng-deep .po-menu-item-active,
+::ng-deep .po-menu-item-selected,
+::ng-deep .po-menu-item:hover,
+::ng-deep .po-dropdown-item:hover,
+::ng-deep .po-dropdown-item-selected
+{
+  background-color: #BBDEFB !important;
+  color:  #045B8F !important;
+  fill:  #045B8F !important; 
+}
+
+/*
+::ng-deep .po-button,
+::ng-deep .po-button-selected
+{
+  background-color:#004b87 !important;
+  color: white !important;
+  fill:  #045B8F !important;   
+}
+*/
+/* =========================
+   BOTÕES PO-UI
+   ========================= */
+
+/* PRIMARY - Buscar Dados */
+::ng-deep .po-button.po-button-primary,
+::ng-deep .po-button-primary {
+  background-color: #004b87 !important;
+  border-color: #004b87 !important;
+  color: #ffffff !important;
+}
+
+/* Ícone dentro do botão primary */
+::ng-deep .po-button.po-button-primary .po-icon,
+::ng-deep .po-button-primary .po-icon,
+::ng-deep .po-button.po-button-primary i,
+::ng-deep .po-button-primary i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* HOVER / FOCUS PRIMARY */
+::ng-deep .po-button.po-button-primary:hover,
+::ng-deep .po-button.po-button-primary:focus,
+::ng-deep .po-button-primary:hover,
+::ng-deep .po-button-primary:focus {
+  background-color: #003a6b !important;
+  border-color: #003a6b !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(4, 91, 143, 0.25) !important;
+}
+
+/* SECONDARY - Limpar filtros */
+::ng-deep .po-button.po-button-secondary,
+::ng-deep .po-button-secondary {
+  background-color: #ffffff !important;
+  border-color: #004b87 !important;
+  color: #004b87 !important;
+}
+
+/* Ícone dentro do botão secondary */
+::ng-deep .po-button.po-button-secondary .po-icon,
+::ng-deep .po-button-secondary .po-icon,
+::ng-deep .po-button.po-button-secondary i,
+::ng-deep .po-button-secondary i {
+  color: #004b87 !important;
+  fill: #004b87 !important;
+}
+
+/* HOVER / FOCUS SECONDARY */
+::ng-deep .po-button.po-button-secondary:hover,
+::ng-deep .po-button.po-button-secondary:focus,
+::ng-deep .po-button-secondary:hover,
+::ng-deep .po-button-secondary:focus {
+  background-color: #eaf4fb !important;
+  border-color: #004b87 !important;
+  color: #004b87 !important;
+  box-shadow: 0 0 0 2px rgba(4, 91, 143, 0.20) !important;
+}
+
+/* SUCCESS - Confirmar Documento */
+::ng-deep .po-button.po-button-success,
+::ng-deep .po-button-success {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+/* Ícone botão success */
+::ng-deep .po-button.po-button-success .po-icon,
+::ng-deep .po-button-success .po-icon,
+::ng-deep .po-button.po-button-success i,
+::ng-deep .po-button-success i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* HOVER / FOCUS SUCCE SS */
+::ng-deep .po-button.po-button-success:hover,
+::ng-deep .po-button.po-button-success:focus,
+::ng-deep .po-button-success:hover,
+::ng-deep .po-button-success:focus {
+  background-color: #157347 !important;
+  border-color: #157347 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.20) !important;
+}
+
+::ng-deep .po-toolbar-title,
+::ng-deep .po-menu-mobile,
+::ng-deep .po-menu-icon-label
+{
+  color:  #045B8F !important;
+}
+
+::ng-deep .po-menu .po-menu-icon-item,
+::ng-deep .po-menu-item,
+::ng-deep .po-menu-collapse-button-icon,
+::ng-deep .po-field-icon
+
+{
+  color:  #045B8F !important;
+  fill:  #045B8F !important; 
+}
+
+::ng-deep .po-input:focus{
+    border-color: #045B8F !important;
+}
+
+/*
+::ng-deep .po-button-primary:hover
+::ng-deep .po-button-primary:focus
+{
+    border-color: #045B8F !important;
+    box-shadow: 0 0 0 2px #045B8F !important;
+}
+*/
+/* ==========================
+   PRIMARY PADRÃO - BUSCAR
+   ========================== */
+::ng-deep .btn-buscar .po-button,
+::ng-deep .btn-buscar.po-button,
+::ng-deep .po-button.po-button-primary {
+  background-color: #004b87 !important;
+  border-color: #004b87 !important;
+  color: #ffffff !important;
+}
+
+::ng-deep .btn-buscar .po-button:hover,
+::ng-deep .btn-buscar .po-button:focus,
+::ng-deep .po-button.po-button-primary:hover,
+::ng-deep .po-button.po-button-primary:focus {
+  background-color: #003a6b !important;
+  border-color: #003a6b !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(4, 91, 143, 0.25) !important;
+}
+
+/* ícone do Buscar */
+::ng-deep .btn-buscar .po-icon,
+::ng-deep .btn-buscar i,
+::ng-deep .po-button.po-button-primary .po-icon,
+::ng-deep .po-button.po-button-primary i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* ==========================
+   SECONDARY - LIMPAR
+   ========================== */
+::ng-deep .btn-limpar .po-button,
+::ng-deep .btn-limpar.po-button,
+::ng-deep .po-button.po-button-secondary {
+  background-color: #ffffff !important;
+  border: 1px solid #004b87 !important;
+  color: #004b87 !important;
+}
+
+::ng-deep .btn-limpar .po-button:hover,
+::ng-deep .btn-limpar .po-button:focus,
+::ng-deep .po-button.po-button-secondary:hover,
+::ng-deep .po-button.po-button-secondary:focus {
+  background-color: #eaf4fb !important;
+  border-color: #004b87 !important;
+  color: #004b87 !important;
+  box-shadow: 0 0 0 2px rgba(4, 91, 143, 0.20) !important;
+}
+
+/* ícone do Limpar */
+::ng-deep .btn-limpar .po-icon,
+::ng-deep .btn-limpar i,
+::ng-deep .po-button.po-button-secondary .po-icon,
+::ng-deep .po-button.po-button-secondary i {
+  color: #004b87 !important;
+  fill: #004b87 !important;
+}
+
+/* ==========================
+   CONFIRMAR - custom verde
+   (não existe success nativo documentado)
+   ========================== */
+::ng-deep .btn-confirmar .po-button,
+::ng-deep .btn-confirmar.po-button {
+  background-color: #198754 !important;
+  border-color: #198754 !important;
+  color: #ffffff !important;
+}
+
+::ng-deep .btn-confirmar .po-button:hover,
+::ng-deep .btn-confirmar .po-button:focus,
+::ng-deep .btn-confirmar.po-button:hover,
+::ng-deep .btn-confirmar.po-button:focus {
+  background-color: #157347 !important;
+  border-color: #157347 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.20) !important;
+}
+
+/* ícone do Confirmar */
+::ng-deep .btn-confirmar .po-icon,
+::ng-deep .btn-confirmar i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+:root {
+  --color-01: #004b87 !important;
+  --color-02: #0088b9 !important;
+  --color-03: #470a68 !important;
+  --color-04: #702876 !important;
+  --color-05: #a51f66 !important;
+  --color-06: #f185ce !important;
+  --color-07: #a6192e !important;
+  --color-08: #f99e1d !important;
+  --color-09: #0088b9 !important;
+  --color-10: #007a87 !important;
+  
+  --color-feedback-info-lightest: #f6e6e5 !important;
+  --color-feedback-info-lighter: #e3aeab !important;
+  --color-feedback-info-light: #d58581 !important;
+  --color-feedback-info-base: #be3e37 !important;
+  --color-feedback-info-dark: #9b2d27 !important;
+  --color-feedback-info-darker: #72211d !important;
+  --color-feedback-info-darkest: #4a1512 !important;
+
+  --po-color-primary: #045B8F !important;
+  --po-color-primary-light: #045B8F !important;
+  --po-color-primary-dark: #045B8F !important;
+
+  border-color: #045B8F !important;
+}
+
+
+.body {
+    margin: 0;
+    min-height: 100vh;
+    width: 100vw;
+    background-image: url('/assets/FundoDN.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+.painelProcess{
+    margin-left: 10px; 
+    padding-bottom: 10px;
+}
+
+.painelProcess p{
+    color: white;
+    font-size:small;
+}
+
+.infoProcess{
+    color: white;
+    border: 1px solid white; 
+    background-color: transparent;
+     border-radius: 4px; 
+     margin-top: 10px; 
+     margin-right: 10px;
+     padding:5px;
+     text-align: center;
+     
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.po-table td {
+    padding: 2px 5px !important;
+}

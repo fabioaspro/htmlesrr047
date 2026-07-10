@@ -1,34 +1,18 @@
 .campofiltros{
+
     display: flex;
-    flex-wrap: wrap; /* 🔥 ESSENCIAL */
     gap: 4px;
     width: 100%;
     justify-items: start;
-    align-items: flex-end;  
+    align-items: flex-end;
+    
 }
-
-.campofiltrosc po-combo,
-.campofiltrosc po-lookup {
-    flex:  1 180px;  /* 👈 cresce + quebra */
-    min-width: 150px; /* 👈 evita ficar minúsculo */
-}
-
-.campofiltrosc po-button {
-    flex: 0 0 auto;
-    white-space: nowrap;
-}
-
-.combo-estab {
-    flex: 2 1 300px;
-    min-width: 250px;
-}
-
 
 
 .filtro-container {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
   padding: 8px 4px;
 }
 
@@ -37,7 +21,7 @@
   display: flex;
   align-items: center;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 12px;
 }
 
 /* Área de ações */
@@ -61,14 +45,14 @@ po-button {
 }
 
 .cabec{
-    display: flex;
-    flex-wrap: wrap; /* 🔥 ESSENCIAL */
-    gap:10px; /* espaçamento entre as duas caixas*/
-    align-items: stretch; 
+    display: flex; 
+    gap:10px;
+    align-items: center; 
 
     justify-content: start; 
     margin-top: 10px;
     z-index: 99;
+    
 }
 
 /* Estabelecimento */
@@ -77,47 +61,22 @@ po-button {
 }
 
 .selecao {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* 🔥 centraliza */
+    display: flex;               /* 👈 ativa o flexbox */
+    align-items: center;         /* 👈 centraliza vertical */
     gap: 4px;
 
-    height: auto;      /* 🔥 remove altura fixa */
-    min-height: 80px;
-    flex: 0 0 auto;
-    padding: 10px 20px;
-
+    flex-grow: 1;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
-    border: 1px solid gray;
-    border-radius: 4px;
+    border: 1px solid gray; 
+    border-radius: 4px; 
+    padding: 0 20px;             /* ajusta padding */
+    height: 102px;
     background-color: whitesmoke;
+    
 }
 
 .combo-full {
   width: 100%;
-}
-
-/* NF */
-::ng-deep .nf {
-  flex: 0 0 130px;
-}
-
-/* Série */
-::ng-deep .serie {
-  flex: 0 0 60px;
-}
-
-::ng-deep .serie input {
-  width: 60px !important;
-}
-
-/* Qtd */
-::ng-deep .qtd {
-  flex: 0 0 80px;
-}
-
-::ng-deep .qtd input {
-  width: 80px !important;
 }
 
 .filtros-container {
@@ -151,6 +110,7 @@ po-button {
 }
 */
 
+
 /* Estabelecimento */
 .filtros-container po-combo:nth-child(1) {
   flex: 0 0 400px; /* largura fixa menor */
@@ -158,7 +118,7 @@ po-button {
 
 /* Destino (MENOR) */
 .filtros-container po-combo:nth-child(2) {
-  flex: 0 0 300px; /* 👈 diminui destino */
+  flex: 0 0 350px; /* 👈 diminui destino */
 }
 
 /* Item (MAIOR) */
@@ -166,6 +126,8 @@ po-button {
   flex: 1 1 auto; /* 👈 ocupa o espaço restante */
   min-width: 350px;
 }
+
+
 
 .tipoBusca{
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
@@ -180,41 +142,21 @@ po-button {
     align-items: center;
 }
 
-.campos-busca {
-  display: flex;
-  gap: 8px; /*espaçamento entre nf serie e qtd*/
-  align-items: flex-end;
-  flex: 0 0 auto;
-}
-
-.botoes-busca {
-    display: flex;
-    gap: 4px; /*espaçamento entre botões buscar e limpar*/
-
-}
-
-.botoes-busca po-button {
-    position: relative;
-    top: -8px;
-}
-
 .campofiltrosc{
-    display: flex;
-    flex-wrap: wrap; /* 🔥 ESSENCIAL */
-    gap: 4px; /*espaçamento entre estabel e emitente*/
-    align-items: flex-end;
-    padding: 10px;
-    min-height: 100px; /* 👈 troca height fixo */
-    width: 70%;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
-    border: 1px solid gray;
-    border-radius: 4px;
-    flex: 1;   /* 🔥 ESSENCIAL → faz crescer */
-    justify-content: flex-start; /* 🔥 força início alinhado */ 
-    align-content: flex-end;
-    background-color: whitesmoke;
-}
 
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 3px;
+    border: 1px solid gray; 
+    border-radius: 4px; 
+    padding:10px; 
+    height: 100px;
+    width: 70%;
+    background-color: whitesmoke;
+  
+}
 
 .grid{
     border: 1px solid lightgray; 
@@ -227,7 +169,7 @@ po-button {
 .item-row {
   display: flex;
   align-items: flex-end;
-  gap: 4px;
+  gap: 8px;
 }
 
 .item-codigo {

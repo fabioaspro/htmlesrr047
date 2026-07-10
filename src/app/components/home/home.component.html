@@ -34,7 +34,7 @@
             </ng-template>
         </po-combo>
         <po-lookup 
-                          class="po-md-12"
+                          class="combo-emitente"
                           name="codEmitente"
                           [(ngModel)]="codEmitente"
                           [p-filter-params]="codigoEmitente ? { codigoEmit: codigoEmitente } : {}"
@@ -52,19 +52,22 @@
                           (p-change)="onEmitenteChange($event)"                
                         >
                 </po-lookup>
-        <po-input class="po-md-6" name="nrNotaFis" [(ngModel)]="nrNotaFis" p-placeholder="NF"              p-label="NF"              p-required [p-maxlength]="7" [disabled]="!filtroPronto"></po-input>
-        <po-input class="po-md-6" name="serie"     [(ngModel)]="serie"     p-placeholder="Serie"           p-label="Serie"           p-required [p-maxlength]="3" [disabled]="!filtroPronto"></po-input>
-        <po-input class="po-md-6" name="qtd"       [(ngModel)]="qtd"       p-placeholder="Qtd"             p-label="Qtd"             p-required [p-maxlength]="7" p-disabled="true"></po-input>
 
-    
-        <po-button p-tooltip="Buscar Dados"    p-icon="bi bi-check2-circle"  p-label="Buscar Dados"    p-kind="primary" (p-click)="Selecionar()" ></po-button>
-        <po-button p-tooltip="Limpar Filtros"  p-icon="bi bi-eraser-fill"    p-label="Limpar filtros"  p-kind="primary" (p-click)="limparFiltros()"> </po-button>
+      <div class="campos-busca">
+        <po-input class="nf"     name="nrNotaFis" [(ngModel)]="nrNotaFis" p-placeholder="NF"              p-label="NF"              p-required [p-maxlength]="7" [disabled]="!filtroPronto"></po-input>
+        <po-input class="serie"  name="serie"     [(ngModel)]="serie"     p-placeholder="Serie"           p-label="Serie"           p-required [p-maxlength]="3" [disabled]="!filtroPronto"></po-input>
+        <po-input class="qtd"    name="qtd"       [(ngModel)]="qtd"       p-placeholder="Qtd"             p-label="Qtd"             p-required [p-maxlength]="7" p-disabled="true"></po-input>
+      </div>
+      <div class="botoes-busca">
+        <po-button p-tooltip="Buscar Dados"    p-icon="bi bi-check2-circle"  p-label="Buscar"    p-kind="primary"   (p-click)="Selecionar()" >   </po-button>
+        <po-button p-tooltip="Limpar Filtros"  p-icon="bi bi-eraser-fill"    p-label="Limpar"    p-kind="secondary" (p-click)="limparFiltros()"> </po-button>
+      </div>  
     </div>
     
 
   <div class="selecao">
 
-      <po-button p-tooltip="Confirmar Documento" p-icon="bi bi-clipboard-check" p-label="Confirmar Documento" p-kind="primary" (p-click)="onConfirmar()"></po-button>
+      <po-button p-tooltip="Confirmar Documento" p-icon="bi bi-clipboard-check" p-label="Confirmar Documento" p-kind="success" p-danger="true" (p-click)="onConfirmar()"></po-button>
       <!--
       <po-button p-tooltip="Relatório"           p-icon="bi bi-printer"         p-label="Relatório"           p-kind="primary" (p-click)="onRelatorio()"></po-button>
       -->
@@ -75,9 +78,9 @@
   
   <p style="font-size: 15px; font-weight: bold; margin-bottom: -20px;">Reparos Selecionados: {{this.total}}</p>
 
-  <p style="font-size: 15px; display: flex; justify-content: flex-end; margin-right: 300px; margin-bottom: -40px;">        
-    <po-button  p-tooltip="Listagem em Excel"  p-icon="an an-microsoft-excel-logo"  p-label=""  (p-click)="onExcel()"          p-kind="primary"> </po-button>
-    <po-button  p-tooltip="Pesquisa Avançada"  p-icon="bi bi-funnel"                p-label=""  (p-click)="onFiltroAvancado()" p-kind="primary"> </po-button>
+  <p style="font-size: 15px; display: flex; justify-content: flex-end; margin-right: 325px; margin-bottom: -52px;">        
+    <po-button  p-tooltip="Listagem em Excel"  p-icon="an an-microsoft-excel-logo"  p-label=""  (p-click)="onExcel()"          p-kind="tertiary"> </po-button>
+    <po-button  p-tooltip="Pesquisa Avançada"  p-icon="bi bi-funnel"                p-label=""  (p-click)="onFiltroAvancado()" p-kind="tertiary"> </po-button>
   </p>
  
   <po-table #grid2  [p-items]="listaReparos"

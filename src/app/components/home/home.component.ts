@@ -296,8 +296,15 @@ export class HomeComponent {
   //--- Limpar Filtros
   limparFiltros(){
 
-    this.filtro = { ...this.filtroPadrao }
-    
+    //this.filtro             = { ...this.filtroPadrao }
+    this.codEstabelecimento = ""
+    this.codEmitente        = ""
+    this.serie              = ""
+    this.nrNotaFis          = ""
+    this.qtd                = ""
+    this.listaReparos       = []
+    this.filtroPronto       = true // Desbloqueia Filtros
+
   }
 
   dtIni: string = <any>new Date();
@@ -558,10 +565,6 @@ export class HomeComponent {
     }
   }
   //--- Chame este método sempre que o grid for recarregado/atualizado.
-
-  
-
-  
 
   //--- TELA HOME DO HTMLESRR047
   public onResumoFinal(obj:any){

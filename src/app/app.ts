@@ -25,8 +25,8 @@ export class AppComponent implements OnInit {
   constructor(private themeService: PoThemeService,
               private sanitizer:    DomSanitizer
   ) {
-    this.themeService.setTheme(poThemeDefault, PoThemeTypeEnum.light, PoThemeA11yEnum.AA)
-    this.themeService.setA11yDefaultSizeSmall(true)
+    //this.themeService.setTheme(poThemeDefault, PoThemeTypeEnum.light, PoThemeA11yEnum.AA)
+    //this.themeService.setA11yDefaultSizeSmall(true)
   }
 
   @ViewChild('menuLateral', { static: true }) menuLateral:
