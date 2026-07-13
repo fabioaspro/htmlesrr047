@@ -47,12 +47,13 @@ export class TotvsService {
   obterColunasReparos(): Array<PoTableColumn> { //colunasDetalhe
     return [
       { property: 'conclui',       label: 'Conclui?',   visible: false},
-      { property: 'rr-bloq',       label: 'Bloq',       visible: true },
+      { property: 'rr-bloq',       label: 'Bloq',       visible: true,  type: 'columnTemplate' },
       { property: 'cod-estabel',   label: 'Estabel',    visible: false},
       { property: 'CodFilial',     label: 'Filial',     visible: true },
       { property: 'NumRR',         label: 'Num.RR',     visible: true },
       { property: 'it-codigo',     label: 'Item',       visible: true },
       { property: 'descItem',      label: 'Descrição',  visible: true },
+      { property: 'buscaBRR',      label: 'BRR',        visible: true },
       { property: 'CodCliOrig',    label: 'CliOrig',    visible: true },
       { property: 'CodCliDest',    label: 'CliDest',    visible: true },
       { property: 'NumSerie-atu',  label: 'numSerie',   visible: true },
@@ -70,13 +71,22 @@ export class TotvsService {
     ]
   }
 
+  obterColunasReimprimirRep(): Array<PoTableColumn> {
+    return [
+      { property: 'CodFilial', label: 'Filial' },
+      { property: 'NumRR',     label: 'Reparo' },
+      { property: 'it-codigo', label: 'Item' },
+      { property: 'descItem',  label: 'Descrição' }
+    ]
+  }
+
   obterColunasArquivos(): Array<PoTableColumn> {
     return [
       {property: 'nomeArquivo', label: "Arquivo",  type: 'columnTemplate'},
       {property: 'mensagem',    label: "Descrição"},
       {property: 'dataHora',    label: "Data",     type:'date', format: "dd/MM/yyyy hh:mm:ss"},
       {property: 'numPedExec',  label: "PedExec"},
-    ];
+    ]
   }
 
   obterColunasBRR(): Array<PoTableColumn> {

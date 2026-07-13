@@ -86,6 +86,18 @@
     <!-- TÍTULO -->
     <div class="titulo-box">
       Etiqueta Impressas de Reparos Trocados<span></span>
+      <div class="po-row">
+        <div class="po-md-12 po-text-right">
+
+          <po-button
+            p-icon="bi bi-arrow-repeat"
+            p-label="Reimprimir Reparos"
+            p-kind="secondary"
+            (p-click)="openReprintModal()">
+          </po-button>
+
+        </div>
+      </div>
     </div>
 
     <!-- BOTÕES 
@@ -129,5 +141,47 @@
   <p class="po-font-text-large">{{labelTimerDetail}}</p>
 </po-modal>
 
-<rpw-acomp [numPedExec]="numPedExec()" [intervalo]="5000" [tentativas]="50">
-</rpw-acomp>
+<po-modal
+  #reprintModal
+  p-title="Reimpressão de Reparos"
+  [p-secondary-action]="cancelAction"
+  p-size="lg">
+
+  <!-- ALERTA -->
+  <po-info>
+    Selecione os reparos que deseja reimprimir.
+  </po-info>
+
+  <!-- FILTROS -->
+  <div class="po-row po-mt-2">
+
+    <po-input name="filial"    p-label="Filial"    [(ngModel)]="filters.filial"    class="po-md-3"></po-input>
+    <po-input name="reparo"    p-label="Reparo"    [(ngModel)]="filters.reparo"    class="po-md-3"></po-input>
+    <po-input name="item"      p-label="Item"      [(ngModel)]="filters.item"      class="po-md-2"></po-input>
+    <po-input name="descricao" p-label="Descrição" [(ngModel)]="filters.descricao" class="po-md-3"></po-input>
+
+    <div class="po-md-1 po-text-right po-mt-4">
+      <po-button p-icon="po-icon-delete" p-label="" p-tooltip="Limpar filtros"  p-kind="secondary" (p-click)="clearFilters()"></po-button>
+    </div>
+
+  </div>
+
+  <!-- TABELA -->
+  <po-table
+            [p-columns]="colunasRep"
+            [p-items]="itemsRep"
+            [p-selectable]="true"
+            
+            class="po-mt-3"></po-table>
+
+  <!-- RODAPÉ CUSTOM -->
+  <div class="po-row po-mt-2">
+    <div class="po-md-12">
+      <strong>Selecionados:</strong> {{ selectedItems.length }} reparo(s)
+    </div>
+  </div>
+
+</po-modal>
+
+
+<rpw-acomp [numPedExec]="numPedExec()" [intervalo]="5000" [tentativas]="50"></rpw-acomp>

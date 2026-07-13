@@ -412,8 +412,11 @@ export class HomeComponent {
     //  return;
     //}
 
+    this.listaReparos  = []
     this.loadTela      = true
     this.labelLoadTela = "Validando Nota"
+    this.cdr.detectChanges()
+
     let paramsTela: any = {items: [{codEstabelecimento: this.codEstabelecimento,
                                     codEmitente: this.codEmitente,
                                     nrNotaFis: this.nrNotaFis,
@@ -427,7 +430,7 @@ export class HomeComponent {
         
         if (!response || !response.items || response.items.length === 0) {
           this.listaReparos = []
-          this.loadTela = false
+          this.loadTela     = false
           this.srvNotification.warning("Não existe dados para o range de seleção !")
           return
         }
@@ -441,19 +444,30 @@ export class HomeComponent {
           this.total = this.grid2.getSelectedRows().length
         })
 
-        this.loadTela     = false
+        console.log (this.total)
 
         this.qtd = response.items.length
         this.filtroPronto      = false // Bloqueia Filtros
-        this.cdr.detectChanges()
+
+        setTimeout(() => {
+          this.loadTela     = false
+          this.cdr.detectChanges()
+        }, 0)
+
     },
       complete: ()=> { 
-                        this.filtroPronto      = false // Bloqueia Filtros 
-                        this.loadTela=false
+                        setTimeout(() => {
+                          this.filtroPronto = false // Bloqueia Filtros 
+                          this.loadTela     = false
+                          this.cdr.detectChanges()
+                        }, 0)
                       },
       error: ()=> {
-                    this.filtroPronto      = false // Bloqueia Filtros
-                    this.loadTela=false
+                    setTimeout(() => {
+                      this.filtroPronto = false // Bloqueia Filtros
+                      this.loadTela     = false
+                      this.cdr.detectChanges()
+                    }, 0)
                   }
     })
 
@@ -712,22 +726,10 @@ export class HomeComponent {
   onRelatorio(){
 
   }
+  
   //--- Marcar desmarcar linha
   total = 0
   changeOptions(selecionados: any[]) {
-
-    /*
-    this.listaSelecionados      = []
-    //não posso limpar aqui senão zera a tablea de itens
-    //this.listaSelecionadosItens = []
-
-    const sel = this.DadosSelecao.getSelectedRows()
-    this.totSelecionado[0] = String(sel.length) //this.DadosSelecao.getSelectedRows().length.toString()
-    this.totSelecionado[1] = String(sel.reduce((acc, item) => acc + Number(item.qtdItens), 0)) //this.DadosSelecao.getSelectedRows().reduce((acc, item) => acc + Number(item.qtdItens), 0)
-    this.totSelecionado[2] = sel.reduce((acc, item) => acc + parseFloat((item.vlItens || 0).toString().replace(',', '.')), 0).toFixed(2) //this.DadosSelecao.getSelectedRows().reduce((acc, item) => acc + parseFloat((item.vlItens || 0).toString().replace(',','.')), 0).toFixed(2)
-
-    this.listaSelecionados = [...sel].sort(this.ordenarCampos(['codEmitente', 'codTransp']))
-    */
 
     this.total = this.grid2.getSelectedRows().length    
 

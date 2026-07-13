@@ -45,14 +45,14 @@ export class AppComponent implements OnInit {
     },
      {
       label: 'Resumo Final',
-      icon: 'bi bi-printer',
+      icon: 'bi bi-list-check',
       link: '/resumofinal',
       shortLabel: 'rensumofinal',
     },
     {
       label: 'Relatório',
       icon: 'bi bi-printer',
-      link: '/relmovto',
+      link: '/home',
       shortLabel: 'Relatório de Reparos da Nota',
     },
     {

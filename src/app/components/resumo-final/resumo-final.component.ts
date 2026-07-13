@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PoDialogService, PoNotificationService, PoTableColumn, PoTableLiterals, PoLoadingModule, PoWidgetModule, PoButtonModule, PoTableModule, PoModalModule, PoModalComponent, PoModalAction, PoFieldModule, PoIconModule, PoLookupColumn, PoGridModule } from '@po-ui/ng-components';
+import { PoDialogService, PoNotificationService, PoTableColumn, PoTableLiterals, PoLoadingModule, PoWidgetModule, PoButtonModule, PoTableModule, PoModalModule, PoModalComponent, PoModalAction, PoFieldModule, PoIconModule, PoLookupColumn, PoGridModule, PoInfoModule } from '@po-ui/ng-components';
 import { TotvsService } from '../../services/totvs-service.service';
 import { TotvsService46 } from '../../services/totvs-service-46.service';
 import { Usuario } from '../../interfaces/usuario';
@@ -18,14 +18,14 @@ import { TecLabLookupService } from '../../services/header-lookup.service';
     templateUrl: './resumo-final.component.html',
     styleUrl: './resumo-final.component.css',
     standalone: true,
-    imports: [NgIf, PoLoadingModule, PoGridModule, 
-      FormsModule,    
-      ReactiveFormsModule, PoWidgetModule, CommonModule, 
-      PoButtonModule, 
-      PoTableModule, BtnDownloadComponent, PoModalModule, 
-      NgClass, RpwComponent, PoWidgetModule , 
-      PoFieldModule  , 
-      PoFieldModule, PoIconModule]
+    imports: [NgIf, PoLoadingModule, PoGridModule,
+    FormsModule,
+    ReactiveFormsModule, PoWidgetModule, CommonModule,
+    PoButtonModule,
+    PoTableModule, BtnDownloadComponent, PoModalModule,
+    NgClass, RpwComponent, PoWidgetModule,
+    PoFieldModule,
+    PoFieldModule, PoIconModule, PoInfoModule]
 
 })
 export class ResumoFinalComponent implements OnInit {
@@ -38,9 +38,18 @@ export class ResumoFinalComponent implements OnInit {
 
   constructor(private cdr:      ChangeDetectorRef) {}
               
-  @ViewChild('timer', { static: true }) telaTimer:
-  | PoModalComponent
-  | undefined;
+  @ViewChild('timer', { static: true }) telaTimer: | PoModalComponent | undefined
+  @ViewChild('reprintModal', { static: true }) telareprintReparo: | PoModalComponent | undefined
+
+  itemsRep: any[] = [];
+  selectedItems: any[] = [];
+
+  filters = {
+    filial: '',
+    reparo: '',
+    item: '',
+    descricao: ''
+  }
 
   //---Filtro
   placeHolderEstabelecimento!: string
@@ -74,6 +83,7 @@ export class ResumoFinalComponent implements OnInit {
 
   colunasArquivos!: PoTableColumn[]
   colunasBRR!: PoTableColumn[]
+  colunasRep!: PoTableColumn[]
 
   nrProcess:string=''
   codEstabel:string=''
@@ -94,6 +104,17 @@ export class ResumoFinalComponent implements OnInit {
     loadingData: 'Buscando Arquivo '
   }
   
+  reprintAction = {
+    label: 'Reimprimir Selecionados',
+    action: () => this.reprint(),
+    disabled: () => this.selectedItems.length === 0
+  }
+
+  cancelAction = {
+    label: 'Cancelar',
+    action: () => this.telareprintReparo?.close()
+  }
+
   acaoCancelarTimer: PoModalAction = {
     action: () => {
       this.fecharTimer()
@@ -101,6 +122,46 @@ export class ResumoFinalComponent implements OnInit {
     },
     label: 'Fechar',
   };
+
+  // CARGA MOCK (substituir pela API)
+  loadReparos() {
+
+    this.itemsRep = [
+      { CodFilial: 26, NumRR: 1362648, 'it-codigo': '001', descItem: 'Fonte 24V' },
+      { CodFilial: 26, NumRR: 1362903, 'it-codigo': '002', descItem: 'Placa lógica principal' },
+      { CodFilial: 26, NumRR: 1362904, 'it-codigo': '003', descItem: 'Display LCD 7"' },
+      { CodFilial: 26, NumRR: 1362905, 'it-codigo': '004', descItem: 'Teclado membrana' },
+      { CodFilial: 26, NumRR: 1362906, 'it-codigo': '005', descItem: 'Cabo flat' }
+    ];
+
+    this.selectedItems = [];
+  }
+
+  // LIMPAR FILTRO
+  clearFilters() {
+    this.filters = {
+      filial: '',
+      reparo: '',
+      item: '',
+      descricao: ''
+    };
+  }
+
+  // REIMPRESSÃO
+  reprint() {
+
+    const selecionados = this.selectedItems;
+
+    console.log('Reimprimindo:', selecionados);
+
+    // Aqui entra chamada REST
+
+    //this.poNotification.success(`${selecionados.length} reparo(s) enviados para reimpressão`);
+
+    this.closeModal()
+  }
+
+
 
   fecharTimer(){
     if(this.sub !== undefined){
@@ -175,8 +236,10 @@ export class ResumoFinalComponent implements OnInit {
         return
       },
       complete: () => { 
-        this.loadTelaConf = false
-        this.cdr.detectChanges()
+        setTimeout(() => {
+          this.loadTelaConf = false
+          this.cdr.detectChanges()
+        }, 0)
       }
     })
 
@@ -203,8 +266,10 @@ export class ResumoFinalComponent implements OnInit {
         return
       },
       complete: () => { 
-        this.loadTelaConf = false
-        this.cdr.detectChanges()
+        setTimeout(() => {
+          this.loadTelaConf = false
+          this.cdr.detectChanges()
+        }, 0)
       }
     })
 
@@ -246,6 +311,20 @@ export class ResumoFinalComponent implements OnInit {
     this.nrNotaFis          = ""
     this.listaArquivosConf  = []
   }
+
+
+  // ABRIR MODAL
+  openReprintModal() {
+    console.log('aqui')
+    this.loadReparos()
+    this.telareprintReparo?.open()
+  }
+
+  // FECHAR
+  closeModal() {
+    this.telareprintReparo?.close()
+  }
+
 
    //---Inicializar
    ngOnInit(): void {
@@ -295,6 +374,7 @@ export class ResumoFinalComponent implements OnInit {
     })
     this.colunasArquivos = this.srvTotvs.obterColunasArquivos()
     this.colunasBRR      = this.srvTotvs.obterColunasBRR()
+    this.colunasRep      = this.srvTotvs.obterColunasReimprimirRep()
     
     /*
     //Arquivo Gerado Conferencia

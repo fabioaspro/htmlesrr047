@@ -4,7 +4,7 @@ import { Routes } from "@angular/router";
 
 export const routes: Routes=[
     {path: '', redirectTo: '/home', pathMatch: 'full'},
-    {path:'home',    loadComponent:()=> import('./components/home/home.component').then(c=>c.HomeComponent)},
+    {path:'home',        loadComponent:()=> import('./components/home/home.component').then(c=>c.HomeComponent)},
     {path:'resumofinal', loadComponent:()=> import('../app/components/resumo-final/resumo-final.component').then(c=>c.ResumoFinalComponent)},
     
     /*

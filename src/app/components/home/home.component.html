@@ -97,16 +97,9 @@
                     [p-height]="alturaGrid"
                     [p-loading]="loadTela"
                     [p-sort]="true"
-                    [p-hide-batch-actions]="false"
+                    [p-hide-batch-actions]="true"
                     [p-hide-table-search]="false">
-                   <ng-template p-table-cell-template let-column="column" let-row="row">
-           
-                    @if(column.property === 'opcoes'){
-                        <div class="menuGrid">
-                            <div><button class="btn"  (click)="Detalhe(row)"><p><i class="bi bi-archive"></i> Notas Fiscais</p></button></div>
-                        </div>
-                    }
-                  </ng-template>
+                   <ng-template p-table-column-template [p-property]="'rr-bloq'" let-value>  {{ value ? 'Sim' : 'Não' }}</ng-template>                  
           
   </po-table>
   
