@@ -345,7 +345,7 @@ export class HomeComponent {
 
   //Listagem em Excel
   onExcel(){
-    let titulo = "RETORNO E CONCLUSÃO DE REPAROS EXTERNOS" //this.tituloTela.split(':')[0]
+    let titulo = "RETORNO E CONCLUSÃO DE REPAROS EXTERNOS." //this.tituloTela.split(':')[0]
     let subTitulo = "LISTAGEM DE DADOS: Estabel.: " + this.codEstabelecimento +
                                      " Emitente.: " + this.codEmitente +
                                         " Serie.: " + this.serie +
