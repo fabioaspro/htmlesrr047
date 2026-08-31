@@ -332,7 +332,7 @@ export class ResumoFinalComponent implements OnInit {
     this.filtroPronto = false // Bloqueia Filtros
     this.cdr.detectChanges()
 
-    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: '_esrr047'}).subscribe({
+    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: '_htmlESRR047'}).subscribe({
         next: (response: any) => {
           this.urlSpool = response.desc
         }})

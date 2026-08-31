@@ -1,4 +1,6 @@
-<div class="sample-container">
+
+
+<div class="sample-container" >
   <po-loading-overlay *ngIf="loadTela===true" [p-text]="labelLoadTela" [p-screen-lock]="true"></po-loading-overlay>
 </div>
 
@@ -8,11 +10,16 @@
                 [message]="mensagemModal"
                 (confirm)="onConfirmarModal($event)">
   </app-dn-modal>
-
-<div class="cabec">
+<po-toolbar id="sample-po-user-guide-basic-title"
+            p-title="1.00.000 - HTMLESRR047 - RETORNO E CONCLUSÃO DE REPAROS EXTERNOS "
+            p-actions-icon="bi bi-question-circle"
+            [p-actions]="toolbarActions">
+        </po-toolbar>
+<div class="cabec" >
+  
     <div class="campofiltrosc">
         
-        <po-combo class="combo-estab" [ngModel]="codEstabelecimento" 
+        <po-combo id='#header' class="combo-estab" [ngModel]="codEstabelecimento" 
                     (ngModelChange)="codEstabelecimento = $event"
             
                     (p-change)="onEstabChange($event)" 
@@ -247,6 +254,13 @@
 <div class="secao-titulo">Parâmetros</div>
     <!-- Grupo de filtros -->
     <div class="filtro-grupo">
+      <po-checkbox name="lPrintEtiq"
+                   [(ngModel)]="filtro.lPrintEtiq"
+                   p-label="Imprimir Etiqueta de Identificação">
+      </po-checkbox>
+    </div>
+
+     <div class="filtro-grupo">
       <po-checkbox name="lLog"
                    [(ngModel)]="filtro.lLog"
                    p-label="Ativar log">

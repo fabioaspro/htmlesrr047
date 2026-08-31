@@ -24,7 +24,7 @@ export class BtnDownloadComponent {
 
   ngOnInit(): void {
     
-    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: '_esrr047'}).subscribe({
+    this.srvTotvs.ObterCadastro({tabela: 'spool', codigo: '_htmlESRR047'}).subscribe({
         next: (response: any) => {
           this.urlSpool = response.desc
           this.cdr.detectChanges()

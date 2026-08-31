@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation, inject, signal } from '@angular/core';
-import { PoMenuItem, PoModalAction, PoModalComponent, PoPageAction, PoRadioGroupOption, PoStepperComponent, PoTableAction, PoTableColumn, PoTableComponent, PoNotificationService, PoDialogService, PoNotification, PoButtonComponent, PoLoadingModule, PoStepperModule, PoWidgetModule, PoDividerModule, PoFieldModule, PoIconModule, PoTableModule, PoButtonModule, PoTooltipModule, PoRadioGroupModule, PoModalModule, PoModule, PoAccordionModule, PoTableLiterals, PoStepComponent, PoContainerModule, PoComboOption, PoPageModule, PoToolbarModule, PoToolbarAction, PoLookupColumn } from '@po-ui/ng-components';
+import { PoMenuItem, PoModalAction, PoModalComponent, PoPageAction, PoRadioGroupOption, PoStepperComponent, PoTableAction, PoTableColumn, PoTableComponent, PoNotificationService, PoDialogService, PoNotification, PoButtonComponent, PoLoadingModule, PoStepperModule, PoWidgetModule, PoDividerModule, PoFieldModule, PoIconModule, PoTableModule, PoButtonModule, PoTooltipModule, PoRadioGroupModule, PoModalModule, PoModule, PoAccordionModule, PoTableLiterals, PoStepComponent, PoContainerModule, PoComboOption, PoPageModule, PoToolbarModule, PoToolbarAction, PoLookupColumn, PoUserGuideService, PoUserGuidePosition, PoUserGuideStep} from '@po-ui/ng-components';
 import { TotvsService } from '../../services/totvs-service.service'
 import { catchError, delay, elementAt, filter, finalize, first, forkJoin, interval, of, Subscription, tap } from 'rxjs';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -47,6 +47,8 @@ export class HomeComponent {
   loadPrioridade:   string = ''
   loadConsolidacao: string = ''
   loadFaturados:    string = ''
+
+  cRPW:             string = ''
 
   //---DN Modal
   mostrarModal  = false
@@ -176,6 +178,7 @@ export class HomeComponent {
   filtro = {
     
     lLog: false,
+    lPrintEtiq: true,
     valEstabIni: "",
     valEstabFim: "ZZZ",
     cLabelCodEstabel: "Estabelecimento",
@@ -193,7 +196,7 @@ export class HomeComponent {
   filtroPadrao = {
     
     lLog: false,
-    
+    lPrintEtiq: true,
     valEstabIni: "",
     valEstabFim: "ZZZ",
     cLabelCodEstabel: "Estabelecimento",
@@ -213,7 +216,9 @@ export class HomeComponent {
   }
 
   constructor(private cdr:      ChangeDetectorRef,
-              private sanitizer: DomSanitizer) {}
+              private sanitizer: DomSanitizer,
+              private poUserGuide: PoUserGuideService
+             ) {}
               
   //--- Referencias
   @ViewChild('grid2')                                grid2!:           PoTableComponent 
@@ -260,6 +265,25 @@ export class HomeComponent {
   modalOptions = [
     { label: 'Aéreo',     value: 'aereo' },
     { label: 'Terrestre', value: 'terrestre' }
+  ];
+
+  //--- Actions
+  readonly toolbarActions: Array<PoToolbarAction> = [
+    {
+      icon: 'bi bi-book',
+      label: 'Manual do Usuário',
+      action: this.abrirAjuda.bind(this)
+    },
+    {
+      icon: 'bi bi-file-earmark-code',
+      label: 'Documentação Técnica',
+      action: this.abrirDocto.bind(this)
+    },
+    {
+      icon: 'bi bi-bullseye',
+      label: 'Escopo',
+      action: this.abrirEscopo.bind(this)
+    }
   ];
 
   readonly acaoSelecionar: PoModalAction = {
@@ -345,7 +369,7 @@ export class HomeComponent {
 
   //Listagem em Excel
   onExcel(){
-    let titulo = "RETORNO E CONCLUSÃO DE REPAROS EXTERNOS." //this.tituloTela.split(':')[0]
+    let titulo = "RETORNO E CONCLUSÃO DE REPAROS EXTERNOS" //this.tituloTela.split(':')[0]
     let subTitulo = "LISTAGEM DE DADOS: Estabel.: " + this.codEstabelecimento +
                                      " Emitente.: " + this.codEmitente +
                                         " Serie.: " + this.serie +
@@ -428,26 +452,32 @@ export class HomeComponent {
     this.srvTotvs.ObterDadosNota(paramsTela).subscribe({
       next:(response:any)=>{
         
+        this.cRPW = `Pedido: ${response.rpw[0].numPedExecucao} (${response.rpw[0].situacaoExecucao} / ${response.rpw[0].motivoExecucao})`
+
+        if (this.cRPW.toUpperCase().includes('EXECUTANDO / EXECUTANDO PEDIDO') || this.cRPW.toUpperCase().includes('NÃO EXECUTADO')){
+          this.srvNotification.error('Não é permitido o Reenvio de Notas com RPW em execução ! ' + this.cRPW)
+          return
+        }
+        console.log (this.cRPW)
         if (!response || !response.items || response.items.length === 0) {
           this.listaReparos = []
           this.loadTela     = false
           this.srvNotification.warning("Não existe dados para o range de seleção !")
+          this.cdr.detectChanges()
           return
         }
         
         this.listaReparos = [...response.items] // força nova referência
-        
         this.listaReparos = (response.items || []).map((item: any) => ({...item, $selected: true}))
 
         setTimeout(() => {
-          this.grid2.selectAll = true 
-          this.total = this.grid2.getSelectedRows().length
-        })
-
-        console.log (this.total)
+          this.grid2.selectAll = true
+          this.cdr.detectChanges()
+        }, 0)
 
         this.qtd = response.items.length
         this.filtroPronto      = false // Bloqueia Filtros
+        this.cdr.detectChanges()
 
         setTimeout(() => {
           this.loadTela     = false
@@ -457,8 +487,9 @@ export class HomeComponent {
     },
       complete: ()=> { 
                         setTimeout(() => {
-                          this.filtroPronto = false // Bloqueia Filtros 
+                          this.filtroPronto = false // Bloqueia Filtros
                           this.loadTela     = false
+                          this.total        = this.grid2.getSelectedRows().length
                           this.cdr.detectChanges()
                         }, 0)
                       },
@@ -466,6 +497,7 @@ export class HomeComponent {
                     setTimeout(() => {
                       this.filtroPronto = false // Bloqueia Filtros
                       this.loadTela     = false
+                      this.total        = this.grid2.getSelectedRows().length
                       this.cdr.detectChanges()
                     }, 0)
                   }
@@ -481,7 +513,7 @@ export class HomeComponent {
     this.filtroPronto      = true // Libera Filtros
 
     //Obter Colunas do Grid
-    this.colunasReparos          = this.srvTotvs.obterColunasReparos()
+    this.colunasReparos    = this.srvTotvs.obterColunasReparos()
 
     //Carregar combo de estabelecimentos
     this.placeHolderEstabelecimento = 'Aguarde, carregando lista...'
@@ -517,8 +549,6 @@ export class HomeComponent {
 
   }
   //-- ngOnInit inicial da tela 
-
-  
 
   //--- Abrir tela de Resumo Final
   AbrirTela(obj:any, cTela:string){
@@ -616,8 +646,12 @@ export class HomeComponent {
 
   public onConfirmarModal(confirmado: boolean) {
 
+    console.log(confirmado)
     this.mostrarModal = false
 
+    if (!confirmado){
+      return
+    }
     //Inicializar acompanhamento rpw
     this.numPedExec.update(() => 1)
 
@@ -627,6 +661,7 @@ export class HomeComponent {
                       codEmitente:        this.codEmitente,
                       nrNotaFis:          this.nrNotaFis,
                       serie:              this.serie,
+                      printEtiq:          this.filtro.lPrintEtiq,
                       ativaLog:           this.filtro.lLog
                     }],
                     items: this.grid2.getSelectedRows()
@@ -1112,8 +1147,89 @@ export class HomeComponent {
   }
   //--- Chamar programa TOTVS
 
-  //--- fora de uso
-  
-  //--- fora de uso
+  //---Funcionar o visualizar PDF
+  pdfUrl?: SafeResourceUrl | undefined
+  @ViewChild('pdfModal', { static: true }) pdfModal: PoModalComponent | undefined
 
+  abrirAjuda() {
+    this.startTour()
+    //const fileUrl = 'assets/docs/ManualEspp047.pdf'
+    //this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl)
+    //this.pdfModal?.open()
+  }
+
+  abrirDocto() {
+    const fileUrl = 'assets/docs/TecnicoEspp047.pdf'
+  
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl)
+    this.pdfModal?.open()
+  }
+
+  abrirEscopo() {
+    const fileUrl = 'assets/docs/EscopoEsrr047.pdf';
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl);
+    this.pdfModal?.open();
+  }
+
+
+  private readonly steps: Array<PoUserGuideStep> = [
+    {
+      element: '#sample-po-user-guide-basic-title',
+      title: 'Bem-vindo ao tour',
+      content: 'Este é um exemplo básico de uso do <strong>PoUserGuideService</strong>.',
+      position: PoUserGuidePosition.Bottom
+    },
+    {
+      element: '#sample-po-user-guide-basic-info',
+      title: 'Conteúdo destacado',
+      content: 'Aqui você pode descrever em detalhes a área destacada para o usuário.',
+      position: PoUserGuidePosition.Right
+    },
+    {
+      element: '#sample-po-user-guide-basic-cta',
+      title: 'Próximos passos',
+      content: 'Clique em <strong>Finalizar</strong> para encerrar o tour.',
+      position: PoUserGuidePosition.Top
+    }
+  ]
+
+  startTour(): void {
+    this.poUserGuide.setSteps(this.steps).setOptions({ showProgress: true }).start();
+  }
+  
+  /*
+  startTour() {
+    this.PoUserGuide
+      .setSteps([
+        {
+          title: 'Tutorial da Tela',
+          content: 'Este guia rápido apresentará os principais recursos da tela de Parâmetros de Envio de Reparos.',
+          position: PoUserGuidePosition.Right
+
+        },
+        {
+          element: '#paleta',
+          title: 'Bem-vindo',
+          content: 'Esta tela permite consultar e manter os Parâmetros de Envio de Reparos. Aqui você pode cadastrar regras de controle por estabelecimento e item, além de acompanhar os registros já configurados.'
+        },
+        {
+          element: '.combo-estab',
+          title: 'Ações da Tela',
+          content:
+                  'Utilize esta área para executar as principais operações:\n\n' +
+                  '• Novo: inclui um novo parâmetro.\n' +
+                  '• Atualizar: recarrega os dados da consulta.\n' +
+                  '• Excluir: remove os registros selecionados.\n' +
+                  '• RPW: gera o relatório em processamento assíncrono.\n' +
+                  '• Carga: abre a rotina de cadastro em lote.'
+        }
+        
+      ])
+      .setOptions({
+        showProgress: true,
+        allowClose: true
+      })
+      .start();
+  }
+  */
 } //--- FIM

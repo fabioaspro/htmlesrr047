@@ -15,7 +15,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   templateUrl: './app.html',
   styleUrls: ['./app.css'],
   standalone: true,
-  imports: [PoMenuModule, NgIf, PoToolbarModule, PoPageModule, RouterOutlet, PoTagModule, PoButtonModule, PoModalModule],
+  imports: [PoMenuModule, NgIf, PoToolbarModule, PoPageModule, RouterOutlet, PoTagModule, PoButtonModule, 
+            PoModalModule,
+           ],
 })
 export class AppComponent implements OnInit {
   private srvTotvs = inject(TotvsService);
@@ -23,15 +25,14 @@ export class AppComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
 
   constructor(private themeService: PoThemeService,
-              private sanitizer:    DomSanitizer
+              private sanitizer:    DomSanitizer,
+              
   ) {
     //this.themeService.setTheme(poThemeDefault, PoThemeTypeEnum.light, PoThemeA11yEnum.AA)
     //this.themeService.setA11yDefaultSizeSmall(true)
   }
 
-  @ViewChild('menuLateral', { static: true }) menuLateral:
-    | PoMenuComponent
-    | undefined;
+  @ViewChild('menuLateral', { static: true }) menuLateral: | PoMenuComponent | undefined;
 
   versao!: string
 
@@ -170,34 +171,45 @@ export class AppComponent implements OnInit {
   ];
 
 
+  //--- Actions
   readonly toolbarActions: Array<PoToolbarAction> = [
-      {
-        icon: 'bi bi-book',
-        label: 'Manual do Usuário',
-        action: this.abrirAjuda.bind(this)
-      },
-      {
-        icon: 'bi bi-file-earmark-code',
-        label: 'Documentação Técnica',
-        action: this.abrirDocto.bind(this)
-      }
-  ]
+    {
+      icon: 'bi bi-book',
+      label: 'Manual do Usuário',
+      action: this.abrirAjuda.bind(this)
+    },
+    {
+      icon: 'bi bi-file-earmark-code',
+      label: 'Documentação Técnica',
+      action: this.abrirDocto.bind(this)
+    },
+    {
+      icon: 'bi bi-bullseye',
+      label: 'Escopo',
+      action: this.abrirEscopo.bind(this)
+    }
+  ];
   
   //---Funcionar o visualizar PDF
   pdfUrl?: SafeResourceUrl | undefined
 
   abrirAjuda() {
-    const fileUrl = 'assets/docs/ManualTransbordo.pdf'
+    //const fileUrl = 'assets/docs/ManualEspp047.pdf'
+    //this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl)
+    //this.pdfModal?.open()
+  }
+
+  abrirDocto() {
+    const fileUrl = 'assets/docs/TecnicoEspp047.pdf'
   
     this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl)
     this.pdfModal?.open()
   }
 
-  abrirDocto() {
-    const fileUrl = 'assets/docs/TecnicoTransbordo.pdf'
-  
-    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl)
-    this.pdfModal?.open()
+  abrirEscopo() {
+    const fileUrl = 'assets/docs/EscopoEsrr047.pdf';
+    this.pdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl);
+    this.pdfModal?.open();
   }
 
   @ViewChild('pdfModal', { static: true }) pdfModal: PoModalComponent | undefined
@@ -257,4 +269,5 @@ export class AppComponent implements OnInit {
   ngAfterContentChecked(): void {
     this.cdRef.detectChanges();
   }
+
 }
