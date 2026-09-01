@@ -160,7 +160,15 @@ po-table {
     width: 100%;
     height: auto;             /* 👈 remove altura fixa */
 }
-
+::ng-deep po-toolbar * {
+    margin-left: 0% !important;
+}
+::ng-deep .po-toolbar,
+::ng-deep .po-toolbar-content,
+::ng-deep .po-toolbar-container {
+    width: 100% !important;
+    max-width: 100% !important;
+}
 .campofiltros po-button {
   margin-top: 24px; /* ajuste fino (20~28 dependendo do tema) */
 }

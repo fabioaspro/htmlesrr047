@@ -1,5 +1,3 @@
-
-
 <div class="sample-container" >
   <po-loading-overlay *ngIf="loadTela===true" [p-text]="labelLoadTela" [p-screen-lock]="true"></po-loading-overlay>
 </div>
@@ -11,7 +9,7 @@
                 (confirm)="onConfirmarModal($event)">
   </app-dn-modal>
 <po-toolbar id="sample-po-user-guide-basic-title"
-            p-title="1.00.000 - HTMLESRR047 - RETORNO E CONCLUSÃO DE REPAROS EXTERNOS "
+            [p-title]="tituloTela"
             p-actions-icon="bi bi-question-circle"
             [p-actions]="toolbarActions">
         </po-toolbar>

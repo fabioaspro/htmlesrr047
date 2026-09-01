@@ -165,6 +165,7 @@ export class HomeComponent {
   cMensagemErroRPW    = ''
 
   versao!:string
+  tituloTela!:string
   EmitenteService             = this.srvheader
   codigoEmitente!: number
 
@@ -508,7 +509,9 @@ export class HomeComponent {
   //-- ngOnInit inicial da tela
   ngOnInit(): void {
 
-    this.versao = environment.versao
+    //versao
+    this.versao     = environment.versao
+    this.tituloTela = this.versao + " - HTMLESRR047 - RETORNO E CONCLUSÃO DE REPAROS EXTERNOS"
     
     this.filtroPronto      = true // Libera Filtros
 
@@ -646,7 +649,6 @@ export class HomeComponent {
 
   public onConfirmarModal(confirmado: boolean) {
 
-    console.log(confirmado)
     this.mostrarModal = false
 
     if (!confirmado){
@@ -691,69 +693,7 @@ export class HomeComponent {
           this.loadTela = false;
           this.srvNotification.error('Erro no acompanhamento');
         }
-      });
-
-    /*FAS
-    this.srvTotvs.onConclusaoRep(params)
-      .pipe(
-        tap(() => this.loadTela = false), // sempre desliga loading
-        filter((response: any) => response?.concluidos?.length > 0), // só continua se tiver dados
-        finalize(() => {
-
-          if (confirmado) {
-            this.onResumoFinal('ok')
-          }
-
-        })
-      )
-      .subscribe({ 
-        next: (response: any) => {
-
-          if (response && response.concluidos && response.concluidos.length > 0) {
-
-            //this.listaConsolidaItens = response.consolidar
-            //Ordena a Lista
-            //this.listaConsolidaItens = (this.listaConsolidaItens as any[]).sort(this.ordenarCampos(['nrConsolidacao']))
-            if (confirmado) {
-              //this.loadTela = false
-              this.srvNotification.success("Pedido de Execução [" + response.pedExec + "] gerado")
-            
-              //Acompanhar rpw
-              if (response.pedExec !== undefined){
-                  this.numPedExec.update(() => response.pedExec)
-              }
-              else {
-                  this.numPedExec.update(() => 0)
-              }               
-            }
-          }
-
-          this.loadTela = false
-        },
-        error: (err) => {
-
-          this.loadTela = false
-
-          let mensagem = 'Erro ao executar a operação'
-
-          if (err.status === 400) {
-            mensagem = 'Serviço [onConclusaoRep] não encontrado no backend.'
-          } else if (err.status === 404) {
-            mensagem = 'Requisição inválida. Verifique os parâmetros.'
-          } else if (err.error?.message) {
-            mensagem = err.error.message
-          }
-
-          this.srvNotification.error(mensagem);
-          return
-        },
-        complete: () => {
-          //if (confirmado) {
-          //  this.onResumoFinal('ok')
-          //}
-        }
-
-      })*/
+      })
 
   }
 

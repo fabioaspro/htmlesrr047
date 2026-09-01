@@ -91,12 +91,14 @@ export class TotvsService {
 
   obterColunasBRR(): Array<PoTableColumn> {
     return [
-      {property: 'filAnt',      label: "Filial Anterior"},
-      {property: 'numrrAnt',    label: "Reparo Anterior"},
-      {property: 'serieAnt',    label: "Série Anterior"},
       {property: 'filAtu',      label: "Filial Atual"},
       {property: 'numrrAtu',    label: "Reparo Atual"},
       {property: 'serieAtu',    label: "Série Atual"},
+      
+      {property: 'filAnt',      label: "Filial Anterior"},
+      {property: 'numrrAnt',    label: "Reparo Anterior"},
+      {property: 'serieAnt',    label: "Série Anterior"},
+      
     ];
   }
 
@@ -121,6 +123,11 @@ export class TotvsService {
   //---Concluir Reparo
   public onConclusaoRep(params?: any){
     return this.http.post(`${this._url}/onConclusaoRep`, params, {headers:headersTotvs}).pipe(take(1))  
+  }
+  
+  //---Concluir Reparo
+  public onImprimirRep(params?: any){
+    return this.http.post(`${this._url}/onImprimirRep`, params, {headers:headersTotvs}).pipe(take(1))  
   }
   //------------ ESRR047
 

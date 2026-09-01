@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PoDialogService, PoNotificationService, PoTableColumn, PoTableLiterals, PoLoadingModule, PoWidgetModule, PoButtonModule, PoTableModule, PoModalModule, PoModalComponent, PoModalAction, PoFieldModule, PoIconModule, PoLookupColumn, PoGridModule, PoInfoModule } from '@po-ui/ng-components';
+import { PoDialogService, PoNotificationService, PoTableColumn, PoTableLiterals, PoLoadingModule, PoWidgetModule, PoButtonModule, PoTableModule, PoModalModule, PoModalComponent, PoModalAction, PoFieldModule, PoIconModule, PoLookupColumn, PoGridModule, PoInfoModule, PoTableComponent, PoToolbarModule, PoToolbarAction } from '@po-ui/ng-components';
 import { TotvsService } from '../../services/totvs-service.service';
 import { TotvsService46 } from '../../services/totvs-service-46.service';
 import { Usuario } from '../../interfaces/usuario';
 import { BtnDownloadComponent } from '../btn-download/btn-download.component';
 import { CommonModule, NgClass, NgIf } from '@angular/common';
-import { interval, Subscription } from 'rxjs';
+import { filter, interval, Subscription, tap } from 'rxjs';
 import { RpwComponent } from "../rpw/rpw.component";
 import { environment } from '../../environments/environment';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -25,7 +25,7 @@ import { TecLabLookupService } from '../../services/header-lookup.service';
     PoTableModule, BtnDownloadComponent, PoModalModule,
     NgClass, RpwComponent, PoWidgetModule,
     PoFieldModule,
-    PoFieldModule, PoIconModule, PoInfoModule]
+    PoFieldModule, PoIconModule, PoInfoModule, PoToolbarModule]
 
 })
 export class ResumoFinalComponent implements OnInit {
@@ -35,11 +35,13 @@ export class ResumoFinalComponent implements OnInit {
   private srvDialog       = inject(PoDialogService)
   private srvNotification = inject(PoNotificationService)
   private router          = inject(ActivatedRoute)
+  private subAcompanhamento: any
 
   constructor(private cdr:      ChangeDetectorRef) {}
               
   @ViewChild('timer', { static: true }) telaTimer: | PoModalComponent | undefined
   @ViewChild('reprintModal', { static: true }) telareprintReparo: | PoModalComponent | undefined
+  @ViewChild('gridModal')  gridModal!:           PoTableComponent 
 
   itemsRep: any[] = [];
   selectedItems: any[] = [];
@@ -62,6 +64,8 @@ export class ResumoFinalComponent implements OnInit {
   serie:                       string = ''
   cMensagemErroRPW                    = ''
   cMensagemErroRPWReparo              = ''
+  versao:                      string = ''
+  tituloTela:                  string = ''
 
   filtroPronto: boolean = false
 
@@ -104,10 +108,34 @@ export class ResumoFinalComponent implements OnInit {
     loadingData: 'Buscando Arquivo '
   }
   
+  //--- Actions
+  readonly toolbarActions: Array<PoToolbarAction> = [
+    {
+      icon: 'bi bi-book',
+      label: 'Manual do Usuário',
+      //action: this.abrirAjuda.bind(this)
+    },
+    {
+      icon: 'bi bi-file-earmark-code',
+      label: 'Documentação Técnica',
+      //action: this.abrirDocto.bind(this)
+    },
+    {
+      icon: 'bi bi-bullseye',
+      label: 'Escopo',
+      //action: this.abrirEscopo.bind(this)
+    }
+  ];
+  
   reprintAction = {
     label: 'Reimprimir Selecionados',
-    action: () => this.reprint(),
+    action: () => this.imprimirRPW(),
     disabled: () => this.selectedItems.length === 0
+  }
+
+  primaryAction = {
+    label: 'Imprimir via RPW',
+    action: () => this.imprimirRPW()
   }
 
   cancelAction = {
@@ -123,17 +151,14 @@ export class ResumoFinalComponent implements OnInit {
     label: 'Fechar',
   };
 
+  get totalSelecionados(): number {
+    return this.itemsRep.filter(i => i.$selected).length;
+  }
   // CARGA MOCK (substituir pela API)
   loadReparos() {
 
-    this.itemsRep = [
-      { CodFilial: 26, NumRR: 1362648, 'it-codigo': '001', descItem: 'Fonte 24V' },
-      { CodFilial: 26, NumRR: 1362903, 'it-codigo': '002', descItem: 'Placa lógica principal' },
-      { CodFilial: 26, NumRR: 1362904, 'it-codigo': '003', descItem: 'Display LCD 7"' },
-      { CodFilial: 26, NumRR: 1362905, 'it-codigo': '004', descItem: 'Teclado membrana' },
-      { CodFilial: 26, NumRR: 1362906, 'it-codigo': '005', descItem: 'Cabo flat' }
-    ];
-
+    this.itemsRep = this.listaRepBRR
+    
     this.selectedItems = [];
   }
 
@@ -146,23 +171,102 @@ export class ResumoFinalComponent implements OnInit {
       descricao: ''
     };
   }
+  
+  imprimirRPW (): void {
 
-  // REIMPRESSÃO
-  reprint() {
+    const selecionados = this.itemsRep.filter(item => item.$selected);
 
-    const selecionados = this.selectedItems;
+    if (!selecionados.length) {
+      this.srvNotification.warning('Selecione ao menos um reparo.');
+      return;
+    }
 
-    console.log('Reimprimindo:', selecionados);
+    // Chamada da API RPW
+    //onImprimirRep
+    //Inicializar acompanhamento rpw
+    this.numPedExec.update(() => 1)
 
-    // Aqui entra chamada REST
+    const params = {
+                    params: [{
+                      codEstabelecimento: this.codEstabelecimento,
+                      codEmitente:        this.codEmitente,
+                      nrNotaFis:          this.nrNotaFis,
+                      serie:              this.serie,
+                      printEtiq:          "",
+                      ativaLog:           ""
+                    }],
+                    items: this.gridModal.getSelectedRows()
+    }
+    
+    this.subAcompanhamento = this.srvTotvs.onImprimirRep(params)
+      .pipe(
+        tap(() => this.loadTela = false),
+        filter((response: any) => response?.concluidos?.length > 0)
+      )
+      .subscribe({
+        next: (response: any) => {
 
-    //this.poNotification.success(`${selecionados.length} reparo(s) enviados para reimpressão`);
+          if (response?.pedExec !== undefined) {
+            this.numPedExec.update(() => response.pedExec)
+          } else {
+            this.numPedExec.update(() => 0)
+            
+          }
+
+          // ✅ terminou o processo
+          if (response?.pedExec !== undefined) {
+
+            this.onBuscaArqRep()
+          }
+
+        },
+        error: (err) => {
+          this.loadTela = false;
+          this.srvNotification.error('Erro no acompanhamento');
+        },
+        complete: () => { 
+        }
+      })
 
     this.closeModal()
   }
 
+  onBuscaArqRep(){
 
+    //Arquivo Gerado Conferencia
+    let paramsTela = this.codEstabelecimento + this.codEmitente + this.nrNotaFis //+ this.serie
 
+    let paramsReparos:any={nrProcess: paramsTela, situacao:'ESRR047REP'}
+    this.srvTotvs.ObterArquivo(paramsReparos).subscribe({
+      next:(item:any)=>{
+        if(item === null) return
+        //this.listaArquivosConf = item.items ?? null
+
+        let paramsrpwReparo:any={iPedExec: item.items[0].numPedExec}
+        this.srvTotvs.onObterRPW(paramsrpwReparo).subscribe({
+          next:(response:any)=>{
+            this.cMensagemErroRPWReparo = "Pedido: " + item.items[0].numPedExec + " - " + response.cpedExec  //response.rpw[0].mensagemRPW
+            this.cdr.detectChanges()
+          },
+          error: (e) => {
+            this.srvNotification.error(e.message)
+            return
+          }
+        })
+      },
+      error: (e) => {
+        this.srvNotification.error(e.message)
+        return
+      },
+      complete: () => { 
+        setTimeout(() => {
+          this.loadTelaConf = false
+          this.cdr.detectChanges()
+        }, 0)
+      }
+    })
+
+  }
   fecharTimer(){
     if(this.sub !== undefined){
        this.sub.unsubscribe()
@@ -276,9 +380,9 @@ export class ResumoFinalComponent implements OnInit {
     //Arquivo Gerado Reparos - aqui carregar lista do que fez BRR
     this.loadTelaRep       = true
     let paramsRep: any = {items: [{codEstabelecimento: this.codEstabelecimento,
-                                    codEmitente: this.codEmitente,
-                                    nrNotaFis: this.nrNotaFis,
-                                    serie: this.serie
+                                   codEmitente: this.codEmitente,
+                                   nrNotaFis: this.nrNotaFis,
+                                   serie: this.serie
                                   }
                                   ]
                           }
@@ -310,12 +414,13 @@ export class ResumoFinalComponent implements OnInit {
     this.serie              = ""
     this.nrNotaFis          = ""
     this.listaArquivosConf  = []
+    this.cdr.detectChanges()
+
   }
 
 
   // ABRIR MODAL
   openReprintModal() {
-    console.log('aqui')
     this.loadReparos()
     this.telareprintReparo?.open()
   }
@@ -328,6 +433,10 @@ export class ResumoFinalComponent implements OnInit {
 
    //---Inicializar
    ngOnInit(): void {
+
+    //versao
+    this.versao     = environment.versao
+    this.tituloTela = this.versao + " - HTMLESRR047 - RETORNO E CONCLUSÃO DE REPAROS EXTERNOS"
 
     this.filtroPronto = false // Bloqueia Filtros
     this.cdr.detectChanges()
@@ -368,154 +477,16 @@ export class ResumoFinalComponent implements OnInit {
         })
 
         this.filtroPronto       = true // ✅ liberou a tela
-        
+        this.cdr.detectChanges()
+
       }
 
     })
     this.colunasArquivos = this.srvTotvs.obterColunasArquivos()
     this.colunasBRR      = this.srvTotvs.obterColunasBRR()
-    this.colunasRep      = this.srvTotvs.obterColunasReimprimirRep()
+    this.colunasRep      = this.srvTotvs.obterColunasBRR()
+    this.cdr.detectChanges()
+
+  }
     
-    /*
-    //Arquivo Gerado Conferencia
-    this.loadTelaConf = true
-    this.loadTelaRep  = true
-    let params:any={nrProcess: '', situacao:'C'}
-    this.srvTotvs.ObterArquivo(params).subscribe({
-      next:(item:any)=>{
-        if(item === null) return
-        this.listaArquivosConf = item.items ?? null
-      },
-      complete: () => { 
-        this.loadTelaConf = false
-        this.loadTelaRep  = false
-        this.cdr.detectChanges() 
-      }
-    })
-    */
-
-    /*
-    //Arquivo Gerado Reparos
-    let paramsRep:any={nrProcess: '', situacao:'R'}
-    this.srvTotvs.ObterArquivo(paramsRep).subscribe({
-      next:(item:any)=>{
-        if(item === null) return
-        this.listaRepBRR = item.items ?? null
-      },
-      complete: () => { 
-        this.loadTelaRep = false
-        this.cdr.detectChanges() 
-      }
-    })
-    */
-
-    this.cdr.detectChanges() 
-
-  }
-
-  /*
-  onGerarResumo(){
-     this.srvDialog.confirm({
-      title: 'ARQUIVO CONFERÊNCIA DE OS',
-      message: "<div class='dlg'><i class='bi bi-question-circle po-font-subtitle'></i><span class='po-font-text-large'> GERAR ARQUIVO ?</span></div>",
-        confirm: () => {
-          this.loadTela = true;
-          let params:any={iExecucao:2, nrProcess:this.nrProcess}
-          this.srvTotvs.ImprimirConfOS(params).subscribe({
-            next:(response:any)=>{
-
-              let params2:any={nrProcess: this.nrProcess, situacao:'L'}
-              this.srvTotvs46.ObterArquivo(params2).subscribe({
-                next:(item:any)=>{
-                  if(item === null) return
-                  this.listaArquivos = item.items ?? null
-                }
-              })
-
-              this.loadTela = false;
-              this.srvNotification.success('Gerado pedido de execução : ' + response.NumPedExec);
-            },
-            error: (e) => {
-              this.loadTela = false;
-            }})
-        },
-        cancel: () => {}
-      });
-  }
-  */
-   onImpressao() {
- /*
-
-    this.srvDialog.confirm({
-      title: 'ARQUIVO CONFERÊNCIA DE OS',
-      literals: { cancel: 'Cancelar', confirm: 'Gerar Arquivo' },
-      message: "<div class='dlg'><i class='bi bi-question-circle po-font-subtitle'></i><span class='po-font-text-large'> GERAR ARQUIVO ?</span></div>",
-      confirm: () => {
-        this.numPedExec.update(()=> 1)
-       // this.telaTimerFoiFechada = false
-       // this.labelPedExec = ''
-       // this.labelTimer = 'Gerando pedido de execução ...'
-       // this.labelTimerDetail = ''
-       // this.acaoCancelarTimer.label='Fechar'
-       // this.telaTimer?.open()
-
-        //this.loadTela = true;
-        let params:any={iExecucao:2, nrProcess:this.nrProcess}
-        this.srvTotvs.ImprimirConfOS(params).subscribe({
-            next: (response: any) => {
-             // this.labelPedExec = 'Pedido Execução'
-             // this.labelTimer = 'Coletando informações do rpw...'
-             
-
-              //Arquivo Gerado
-              let params2:any={nrProcess: this.nrProcess, situacao:'L'}
-              this.srvTotvs46.ObterArquivo(params2).subscribe({
-                   next: (item: any) => {
-                this.listaArquivos = item.items;
-                this.numPedExec.update(()=> response.NumPedExec)
-               
-              },
-            });
-
-            this.loadTela = false;
-           
-          },
-          error: (e) => {
-            this.loadTela = false;
-          },
-        });
-      },
-      cancel: () => {
-       
-      },
-    });
-
-  */
-  }
-    onFinalizar(){
-  /*
-
-    this.srvDialog.confirm({
-      title: `FINALIZAR PROCESSO: ${this.nrProcess}`,
-      message: "<div class='dlg'><i class='bi bi-question-circle po-font-subtitle'></i><span class='po-font-text-large'> DESEJA FINALIZAR O PROCESSO ?</span></div>",
-        confirm: () => {
-          this.loadTela = true;
-          
-          let params:any={codEstabel:this.codEstabel, nrProcess:this.nrProcess}
-          this.srvTotvs.EncerrarProcesso(params).subscribe({
-            next:(response:any)=>{
-              this.loadTela = false;
-              this.router.navigate(['monitor'])
-            },
-            error: (e) => {
-              this.loadTela = false;
-            }})
-        },
-        cancel: () => {}
-      });
-
-
-
-  */
-   }
 }
